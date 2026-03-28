@@ -1,3 +1,2 @@
 import '../styles/main.scss';
-
-console.log('работает 🚀');
+import { mood } from './ui/events.js';

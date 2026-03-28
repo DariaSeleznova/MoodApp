@@ -8,6 +8,48 @@
 </head>
 
 <body>
+    <header>
+        <h1>MoodApp</h1>
+        <nav class="mood-nav">
+            <button class="mood-btn" data-mood="happy">😁</button>
+            <button class="mood-btn" data-mood="relaxed">🧘</button>
+            <button class="mood-btn" data-mood="excited">🤩</button>
+            <button class="mood-btn" data-mood="spirited">💪</button>
+            <button class="mood-btn" data-mood="tired">😴</button>
+            <button class="mood-btn" data-mood="sad">😢</button>
+        </nav>
+        <div class="client-area">
+            <button class="login-btn">Login</button>
+            <button class="signup-btn">Sign Up</button>
+            <select name="" id="lang-switch">
+                <option value="en">English</option>
+                <option value="uk">Українська</option>
+            </select>
+        </div>
+    </header>
+    <section class="movies">
+        <h2>Movies</h2>
+        <div id="movies-list"></div>
+        <div class="controls">
+            <button id="prev-movie">←</button>
+            <button id="next-movie">→</button>
+        </div>
+    </section>
+    <section class="series">
+        <h2>Series</h2>
+        <div id="series-list"></div>
+        <div class="controls">
+            <button id="prev-series">←</button>
+            <button id="next-series">→</button>
+    </section>
+    <section class="books">
+        <h2>Books</h2>
+        <div id="books-list"></div>
+    </section>
+    <section class="music">
+        <h2>Music</h2>
+        <div id="music-list"></div>
+    </section>
 
 </body>
 
