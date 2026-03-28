@@ -1,4 +1,4 @@
-const API_KEY = 'AIzaSyBZrlhy0xrXYF7eAilnKyeywFS_8KfgWrc';
+const API_KEY = process.env.GOOGLE_BOOKS;
 
 export async function getBooksByMood(mood) {
     const queryMap = {

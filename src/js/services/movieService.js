@@ -1,4 +1,4 @@
-const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMmJmMjk1YjRhYzMzNjYxMThjZDdkMTVjZjI4MWI1OCIsIm5iZiI6MTc3NDUzNTM5Ny40NDUsInN1YiI6IjY5YzU0MmU1NGNjNDU2ZTc4NjQyMGI2ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.4nI69jLzwrJslMbhRVB_V8bMf8q6h-EaJ3mVxA1YrK4';
+const API_KEY = process.env.TMDB_TOKEN;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 export async function getMoviesByMood(mood) {
@@ -16,7 +16,7 @@ export async function getMoviesByMood(mood) {
 
     const response = await fetch(url, {
         headers: {
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMmJmMjk1YjRhYzMzNjYxMThjZDdkMTVjZjI4MWI1OCIsIm5iZiI6MTc3NDUzNTM5Ny40NDUsInN1YiI6IjY5YzU0MmU1NGNjNDU2ZTc4NjQyMGI2ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.4nI69jLzwrJslMbhRVB_V8bMf8q6h-EaJ3mVxA1YrK4'
+            Authorization: `Bearer ${API_KEY}`
         }
     });
 
@@ -39,7 +39,7 @@ export async function getSeriesByMood(mood) {
 
     const response = await fetch(url, {
         headers: {
-            Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhMmJmMjk1YjRhYzMzNjYxMThjZDdkMTVjZjI4MWI1OCIsIm5iZiI6MTc3NDUzNTM5Ny40NDUsInN1YiI6IjY5YzU0MmU1NGNjNDU2ZTc4NjQyMGI2ZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.4nI69jLzwrJslMbhRVB_V8bMf8q6h-EaJ3mVxA1YrK4'
+            Authorization: `Bearer ${API_KEY}`
         }
     });
 

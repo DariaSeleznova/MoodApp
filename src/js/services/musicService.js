@@ -1,4 +1,4 @@
-const API_KEY = '937ce42d2a1ce468d95fedc11bf6eae7';
+const API_KEY = process.env.LASTFM_KEY;
 
 export async function getMusicByMood(mood) {
     const tagMap = {
