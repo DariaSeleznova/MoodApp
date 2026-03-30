@@ -1,4 +1,293 @@
-body {
-    background: #111;
+// Переменные
+$dark-bg: #111;
+$card-bg: #1c1c1c;
+$card-hover: #2a2a2a;
+$accent-red: #e50914;
+$accent-blue: #4dabf7;
+$accent-green: #1db954;
+$border-radius: 12px;
+$shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+// Миксины
+@mixin card-base {
+    display: flex;
+    gap: 20px;
+    background: $card-bg;
     color: white;
+    border-radius: $border-radius;
+    padding: 6px;
+    box-shadow: $shadow;
+}
+
+@mixin small-card-base {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: $card-bg;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease, background 0.2s ease;
+
+    &:hover {
+        transform: scale(1.02);
+        background: $card-hover;
+    }
+}
+
+@mixin card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+// Основные стили
+body {
+    background: $dark-bg;
+    color: white;
+}
+
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title_app {
+    display: flex;
+    justify-content: center;
+}
+
+.app {
+    display: grid;
+    gap: 20px;
+    grid-template-areas:
+        "movies movies books"
+        "movies movies books"
+        "movies movies books"
+        "movies movies music"
+        "series series music"
+        "series series music"
+        "series series music";
+
+    .movies,
+    .series {
+        >div {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .movie-card,
+        .series-card {
+            @include card-base;
+            min-width: 600px;
+            margin: 0;
+
+            &__image img {
+                width: 300px;
+                border-radius: 8px;
+            }
+
+            &__info {
+                @include card-info;
+            }
+
+            &__title {
+                font-size: 20px;
+                margin: 0;
+            }
+
+            &__rating,
+            &__description {
+                font-size: 14px;
+            }
+
+            &__rating {
+                opacity: 0.8;
+            }
+
+            &__description {
+                opacity: 0.7;
+            }
+
+            &__actions {
+                margin-top: auto;
+            }
+
+            .btn-trailer {
+                background: $accent-red;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 6px;
+                color: white;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .movies {
+        grid-area: movies;
+    }
+
+    .series {
+        grid-area: series;
+    }
+
+    .books {
+        grid-area: books;
+
+        .book-card {
+            @include small-card-base;
+
+            &__image img,
+            &__placeholder {
+                width: 60px;
+                height: 90px;
+                border-radius: 6px;
+                object-fit: cover;
+            }
+
+            &__placeholder {
+                background: #333;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+            }
+
+            &__info {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+            }
+
+            &__title {
+                font-weight: bold;
+                margin: 0;
+            }
+
+            &__author {
+                font-size: 12px;
+                opacity: 0.7;
+            }
+
+            &__btn {
+                margin-top: 6px;
+                font-size: 12px;
+                color: $accent-blue;
+                text-decoration: none;
+            }
+        }
+    }
+
+    .music {
+        grid-area: music;
+        margin: auto;
+
+        .music-card {
+            @include small-card-base;
+
+            &__image img,
+            &__placeholder {
+                width: 60px;
+                height: 60px;
+                border-radius: 8px;
+                object-fit: cover;
+            }
+
+            &__placeholder {
+                background: #333;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+            }
+
+            &__info {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+            }
+
+            &__title {
+                font-weight: bold;
+                margin: 0;
+            }
+
+            &__artist {
+                font-size: 12px;
+                opacity: 0.7;
+            }
+
+            &__btn {
+                margin-top: 6px;
+                font-size: 12px;
+                color: $accent-green;
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+.movies-loader {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #ccc;
+    border-top-color: black;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.skeleton-card {
+    width: 200px;
+    height: 300px;
+    border-radius: 12px;
+    background: #e0e0e0;
+    margin: 10px auto;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-line {
+    height: 20px;
+    margin: 10px 0;
+    border-radius: 6px;
+    background: #e0e0e0;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+
+    0%,
+    100% {
+        background-color: #e0e0e0;
+    }
+
+    50% {
+        background-color: #f5f5f5;
+    }
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
 }

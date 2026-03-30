@@ -1,4 +1,5 @@
-import { getContentByMood } from '../controllers/moodController';
+
+import { loadBooks, loadMovies, loadMusic, loadSeries } from '../controllers/moodController';
 import { renderMovies, renderMusic, renderSeries, renderBooks, nextMovie, prevMovie, nextSeries, prevSeries } from './render';
 
 document.getElementById('next-movie').addEventListener('click', nextMovie);
@@ -15,10 +16,34 @@ moodButtons.forEach((btn) => {
 });
 
 async function handleMoodChange(mood) {
-    const data = await getContentByMood(mood);
-
-    renderMovies(data.movies);
-    renderSeries(data.series);
-    renderBooks(data.books);
-    renderMusic(data.music);
+    loadMovies(mood);
+    loadSeries(mood);
+    loadMusic(mood);
+    loadBooks(mood);;
 }
+export function showMoviesLoading() {
+    document.querySelector('.movies-loader')?.classList.remove('hidden');
+}
+
+export function hideMoviesLoading() {
+    document.querySelector('.movies-loader')?.classList.add('hidden');
+}
+export function showSeriesLoading() {
+    document.querySelector('.series-loader')?.classList.remove('hidden');
+}
+export function hideSeriesLoading() {
+    document.querySelector('.series-loader')?.classList.add('hidden');
+}
+export function showBooksLoading() {
+    document.querySelector('.books-loader')?.classList.remove('hidden');
+}
+export function hideBooksLoading() {
+    document.querySelector('.books-loader')?.classList.add('hidden');
+}
+export function showMusicLoading() {
+    document.querySelector('.music-loader')?.classList.remove('hidden');
+}
+export function hideMusicLoading() {
+    document.querySelector('.music-loader')?.classList.add('hidden');
+}
+

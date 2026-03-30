@@ -1,4 +1,5 @@
-const API_KEY = process.env.TMDB_TOKEN;
+
+const API_KEY = process.env.TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 export async function getMoviesByMood(mood) {
@@ -12,13 +13,13 @@ export async function getMoviesByMood(mood) {
 
     const genreId = genreMap[mood] || 35;
 
-    const url = `${BASE_URL}/discover/movie?with_genres=${genreId}&language=en-US`;
+    const url = `${BASE_URL}/discover/movie?api_key=${API_KEY}&with_genres=${genreId}&language=en-US`;
 
-    const response = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${API_KEY}`
-        }
-    });
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch movies');
+    }
 
     const data = await response.json();
 
@@ -35,13 +36,12 @@ export async function getSeriesByMood(mood) {
 
     const genreId = genreMap[mood] || 35;
 
-    const url = `${BASE_URL}/discover/tv?with_genres=${genreId}&language=en-US`;
+    const url = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&language=en-US`;
 
-    const response = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${API_KEY}`
-        }
-    });
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch series');
+    }
 
     const data = await response.json();
 

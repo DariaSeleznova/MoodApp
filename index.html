@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <header>
+    <header class="container">
         <h1>MoodApp</h1>
         <nav class="mood-nav">
             <button class="mood-btn" data-mood="happy">😁</button>
@@ -27,29 +27,45 @@
             </select>
         </div>
     </header>
-    <section class="movies">
-        <h2>Movies</h2>
-        <div id="movies-list"></div>
-        <div class="controls">
-            <button id="prev-movie">←</button>
-            <button id="next-movie">→</button>
-        </div>
-    </section>
-    <section class="series">
-        <h2>Series</h2>
-        <div id="series-list"></div>
-        <div class="controls">
-            <button id="prev-series">←</button>
-            <button id="next-series">→</button>
-    </section>
-    <section class="books">
-        <h2>Books</h2>
-        <div id="books-list"></div>
-    </section>
-    <section class="music">
-        <h2>Music</h2>
-        <div id="music-list"></div>
-    </section>
+    <div class="title_app container">
+        <h1>Выбери свое настроение</h1>
+    </div>
+    <div class="app container">
+        <section class="movies">
+            <h2>Movies</h2>
+            <div id="movies-list"></div>
+            <div class="controls">
+                <button id="prev-movie">←</button>
+                <button id="next-movie">→</button>
+                <div class="movies-loader hidden"></div>
+
+            </div>
+        </section>
+        <section class="series">
+            <h2>Series</h2>
+            <div id="series-list"></div>
+            <div class="controls">
+                <button id="prev-series">←</button>
+                <button id="next-series">→</button>
+                <div class="series-loader hidden"></div>
+
+            </div>
+
+        </section>
+        <section class="books">
+            <h2>Books</h2>
+            <div id="books-list"></div>
+            <div class="books-loader hidden"></div>
+
+        </section>
+        <section class="music">
+            <h2>Music</h2>
+            <div id="music-list"></div>
+            <div class="music-loader hidden"></div>
+
+        </section>
+    </div>
+
 
 </body>
 
