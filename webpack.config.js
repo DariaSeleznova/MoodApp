@@ -5,11 +5,14 @@ const Dotenv = require('dotenv-webpack');
 
 
 module.exports = {
-    entry: './src/js/index.js',
+    entry: {
+        main: './src/js/index.js',
+        favorites: './src/js/favorites.js'
+    },
 
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js',
+        filename: '[name].bundle.js',
         clean: true
     },
 
@@ -34,6 +37,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './index.html'
         }),
-        new Dotenv()
+        new Dotenv(),
+        new HtmlWebpackPlugin({
+            template: 'favorites.html',
+            filename: 'favorites.html',
+            chunks: ['favorites']
+        })
     ]
 };

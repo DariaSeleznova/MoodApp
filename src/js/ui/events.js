@@ -1,12 +1,17 @@
 
-import { loadBooks, loadMovies, loadMusic, loadSeries } from '../controllers/moodController';
-import { renderMovies, renderMusic, renderSeries, renderBooks, nextMovie, prevMovie, nextSeries, prevSeries } from './render';
+import { loadBooks, loadMovies, loadMusic, loadSeries, loadTrendingContent } from '../controllers/moodController';
+import { nextMovie, prevMovie, nextSeries, prevSeries } from './render';
+
 
 document.getElementById('next-movie').addEventListener('click', nextMovie);
 document.getElementById('prev-movie').addEventListener('click', prevMovie);
 document.getElementById('next-series').addEventListener('click', nextSeries);
 document.getElementById('prev-series').addEventListener('click', prevSeries);
 const moodButtons = document.querySelectorAll('.mood-btn');
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadTrendingContent();
+});
 
 moodButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {

@@ -1,3 +1,5 @@
+import { toggleFavorite, isFavorite } from '../services/favoritesService';
+
 let currentIndex = 0;
 let moviesData = [];
 
@@ -38,14 +40,34 @@ function showMovie() {
     <p class="movie-card__rating">⭐ ${movie.vote_average}</p>
 
     <p class="movie-card__description">
-      ${movie.overview?.slice(0, 120) || 'No description available'}...
+      ${movie.overview || 'No description available'}...
     </p>
 
     <div class="movie-card__actions">
       <button class="btn-trailer">▶ Trailer</button>
     </div>
+   <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
+  <svg class="heart" viewBox="0 0 32 32">
+    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z" />
+  </svg>
+</button>
   </div>
 `;
+    const favBtn = card.querySelector('.btn-fav');
+
+    favBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // чтобы не триггерить клик по карточке
+
+        toggleFavorite({
+            id: movie.id,
+            title: movie.title,
+            image: movie.poster_path,
+            type: 'movie',
+            rating: movie.vote_average
+        });
+
+        favBtn.classList.toggle('active');
+    });
 
     container.appendChild(card);
 }
@@ -103,11 +125,32 @@ function showSeries() {
     <div class="series-card__actions">
       <button class="btn-trailer">▶ Trailer</button>
     </div>
+    <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
+  <svg class="heart" viewBox="0 0 32 32">
+    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
+  </svg>
+</button>
   </div>
 `;
+    const favBtn = card.querySelector('.btn-fav');
+
+    favBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // чтобы не триггерить клик по карточке
+
+        toggleFavorite({
+            id: show.id,
+            title: show.name,
+            image: show.poster_path,
+            type: 'series',
+            rating: show.vote_average
+        });
+
+        favBtn.classList.toggle('active');
+    });
 
     container.appendChild(card);
 }
+
 export function nextSeries() {
     if (currentSeriesIndex < seriesData.length - 1) {
         currentSeriesIndex++;
@@ -154,8 +197,27 @@ export function renderMusic(tracks) {
                 <a href="${track.url}" target="_blank" class="music-card__btn">
                     ▶ Listen
                 </a>
+                <button class="btn-fav ${isFavorite(track.id) ? 'active' : ''}">
+  <svg class="heart" viewBox="0 0 32 32">
+    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
+  </svg>
+</button>
             </div>
         `;
+        const favBtn = card.querySelector('.btn-fav');
+
+        favBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // чтобы не триггерить клик по карточке
+
+            toggleFavorite({
+                id: track.url, // 🔥 уникальный id (важно!)
+                title: track.name,
+                image: track.image,
+                type: 'music',
+                link: track.url
+            });
+            favBtn.classList.toggle('active');
+        });
 
         container.appendChild(card);
     });
@@ -191,9 +253,28 @@ export function renderBooks(books) {
                 <a href="${link}" target="_blank" class="book-card__btn">
                     📖 Preview
                 </a>
+                <button class="btn-fav ${isFavorite(book.id) ? 'active' : ''}">
+  <svg class="heart" viewBox="0 0 32 32">
+    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
+  </svg>
+</button>
             </div>
         `;
+        const favBtn = card.querySelector('.btn-fav');
 
+        favBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // чтобы не триггерить клик по карточке
+
+            toggleFavorite({
+                id: book.id,
+                title: info.title,
+                image: info.imageLinks?.thumbnail,
+                type: 'book',
+                link: info.previewLink
+            });
+
+            favBtn.classList.toggle('active');
+        });
         container.appendChild(card);
     });
 }

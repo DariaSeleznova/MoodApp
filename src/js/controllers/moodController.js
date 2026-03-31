@@ -1,8 +1,41 @@
-import { getMoviesByMood } from '../services/movieService';
-import { getSeriesByMood } from '../services/movieService';
+import { getMoviesByMood, getTrendingMovies } from '../services/movieService';
+import { getSeriesByMood, getTrendingSeries } from '../services/movieService';
 import { getMusicByMood } from '../services/musicService';
 import { getBooksByMood } from '../services/bookService';
 import { renderMoviesSkeleton, renderSeriesSkeleton, renderBooksSkeleton, renderMusicSkeleton } from '../ui/render';
+import * as renderer from '../ui/render';
+import { hideBooksLoading, hideMoviesLoading, hideMusicLoading, hideSeriesLoading } from '../ui/events';
+
+export async function loadTrendingContent() {
+    loadTrendingMovies();
+    loadTrendingSeries();
+    loadMusic('happy'); // временно
+    loadBooks('happy');
+}
+export async function loadTrendingMovies() {
+    try {
+        renderer.renderMoviesSkeleton();
+
+        const movies = await getTrendingMovies();
+
+        renderer.renderMovies(movies);
+
+    } catch (e) {
+        renderer.showError('Ошибка фильмов');
+    }
+}
+export async function loadTrendingSeries() {
+    try {
+        renderer.renderSeriesSkeleton();
+
+        const series = await getTrendingSeries();
+
+        renderer.renderSeries(series);
+
+    } catch (e) {
+        renderer.showError('Ошибка сериалов');
+    }
+}
 
 export async function getContentByMood(mood) {
     const movies = await getMoviesByMood(mood);
@@ -17,9 +50,6 @@ export async function getContentByMood(mood) {
         music
     };
 }
-
-import * as renderer from '../ui/render';
-import { hideBooksLoading, hideMoviesLoading, hideMusicLoading, hideSeriesLoading } from '../ui/events';
 
 export async function loadMovies(mood) {
     try {
@@ -48,6 +78,7 @@ export async function loadSeries(mood) {
         hideSeriesLoading();
     }
 }
+
 export async function loadBooks(mood) {
     try {
         renderBooksSkeleton();
@@ -61,6 +92,7 @@ export async function loadBooks(mood) {
         hideBooksLoading();
     }
 }
+
 export async function loadMusic(mood) {
     try {
         renderMusicSkeleton();
