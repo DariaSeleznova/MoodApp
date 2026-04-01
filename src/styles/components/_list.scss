@@ -1,0 +1,19 @@
+.list-card {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    background: #1c1c1c;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.list-card__image img {
+    width: 120px;
+    border-radius: 8px;
+}
+
+.list-card__info h3 {
+    margin: 0;
+}

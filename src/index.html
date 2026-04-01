@@ -5,18 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodApp</title>
+    <script src="./js/main.bundle.js" defer></script>
 </head>
 
 <body>
     <header class="container">
-        <h1>MoodApp</h1>
+        <div class="logo"><img class="logo" alt="MoodApp logo"></div>
         <nav class="mood-nav">
-            <button class="mood-btn" data-mood="happy">😁</button>
-            <button class="mood-btn" data-mood="relaxed">🧘</button>
-            <button class="mood-btn" data-mood="excited">🤩</button>
-            <button class="mood-btn" data-mood="spirited">💪</button>
-            <button class="mood-btn" data-mood="tired">😴</button>
-            <button class="mood-btn" data-mood="sad">😢</button>
+            <button class="mood-btn" data-mood="happy"></button>
+            <button class="mood-btn" data-mood="relaxed"></button>
+            <button class="mood-btn" data-mood="excited"></button>
+            <button class="mood-btn" data-mood="spirited"></button>
+            <button class="mood-btn" data-mood="tired"></button>
+            <button class="mood-btn" data-mood="sad"></button>
         </nav>
         <div class="client-area">
             <button class="login-btn">Login</button>
@@ -39,7 +40,7 @@
                 <button id="prev-movie">←</button>
                 <button id="next-movie">→</button>
                 <div class="movies-loader hidden"></div>
-
+                <a class="more-link" data-type="movies" href="#">More...</a>
             </div>
         </section>
         <section class="series">
@@ -49,7 +50,7 @@
                 <button id="prev-series">←</button>
                 <button id="next-series">→</button>
                 <div class="series-loader hidden"></div>
-
+                <a class="more-link" data-type="series" href="#">More...</a>
             </div>
 
         </section>
@@ -57,17 +58,16 @@
             <h2>Books</h2>
             <div id="books-list"></div>
             <div class="books-loader hidden"></div>
-
+            <a class="more-link" data-type="books" href="#">More...</a>
         </section>
         <section class="music">
             <h2>Music</h2>
             <div id="music-list"></div>
             <div class="music-loader hidden"></div>
-
+            <a class="more-link" data-type="music" href="#">More...</a>
         </section>
     </div>
 
-    <script type="module" src="./js/main.bundle.js"></script>
 </body>
 
 </html>

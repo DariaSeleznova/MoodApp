@@ -11,20 +11,40 @@ const moodButtons = document.querySelectorAll('.mood-btn');
 
 document.addEventListener('DOMContentLoaded', () => {
     loadTrendingContent();
+    updateMoreLinks();
 });
 
 moodButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
-        const moodValue = e.target.dataset.mood;
+        const moodValue = btn.dataset.mood;
         handleMoodChange(moodValue);
     });
 });
 
+let currentMood = null;
 async function handleMoodChange(mood) {
+    console.log('Mood selected:', mood);
+    currentMood = mood;
     loadMovies(mood);
     loadSeries(mood);
     loadMusic(mood);
-    loadBooks(mood);;
+    loadBooks(mood);
+
+    updateMoreLinks();
+}
+
+function updateMoreLinks() {
+    const links = document.querySelectorAll('.more-link');
+
+    links.forEach(link => {
+        const type = link.dataset.type;
+
+        if (currentMood) {
+            link.href = `list.html?type=${type}&mood=${currentMood}`;
+        } else {
+            link.href = `list.html?type=${type}`;
+        }
+    });
 }
 export function showMoviesLoading() {
     document.querySelector('.movies-loader')?.classList.remove('hidden');

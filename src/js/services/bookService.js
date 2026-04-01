@@ -1,6 +1,6 @@
 const API_KEY = process.env.GOOGLE_KEY;
 
-export async function getBooksByMood(mood) {
+export async function getBooksByMood(mood, limit = 3) {
     const queryMap = {
         happy: 'funny novels',
         sad: 'sad love story',
@@ -10,9 +10,10 @@ export async function getBooksByMood(mood) {
         spirited: 'motivational books'
     };
 
-    const query = queryMap[mood] || 'popular books';
+    const query = queryMap[mood] || 'popular2026 books';
 
-    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=3&key=${API_KEY}`;
+
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=${limit}&key=${API_KEY}`;
 
     const res = await fetch(url);
     if (!res.ok) {
@@ -21,5 +22,18 @@ export async function getBooksByMood(mood) {
 
     const data = await res.json();
 
+    return data.items || [];
+}
+
+export async function getTrendingBooks(limit = 30) {
+    const query = 'trending books 2026';
+    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=${limit}&key=${API_KEY}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+        throw new Error('Failed to fetch trending books');
+    }
+
+    const data = await res.json();
     return data.items || [];
 }

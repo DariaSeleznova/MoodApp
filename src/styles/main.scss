@@ -1,5 +1,5 @@
 @use './components/favorites';
-
+@use './components/list';
 // Переменные
 $dark-bg: #111;
 $card-bg: #1c1c1c;
@@ -55,6 +55,40 @@ header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+
+    .logo {
+        width: 250px;
+        height: auto;
+        object-fit: contain;
+        display: block;
+    }
+
+    .mood-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .mood-btn {
+            width: 100px;
+            height: 100px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            background-color: $card-hover;
+            background-size: cover;
+            background-position: center;
+
+            img {
+                width: 60%;
+                height: 60%;
+            }
+
+            &.spirited {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    }
 }
 
 .title_app {

@@ -1,7 +1,7 @@
 import { getMoviesByMood, getTrendingMovies } from '../services/movieService';
 import { getSeriesByMood, getTrendingSeries } from '../services/movieService';
-import { getMusicByMood } from '../services/musicService';
-import { getBooksByMood } from '../services/bookService';
+import { getMusicByMood, getTrendingMusic } from '../services/musicService';
+import { getBooksByMood, getTrendingBooks } from '../services/bookService';
 import { renderMoviesSkeleton, renderSeriesSkeleton, renderBooksSkeleton, renderMusicSkeleton } from '../ui/render';
 import * as renderer from '../ui/render';
 import { hideBooksLoading, hideMoviesLoading, hideMusicLoading, hideSeriesLoading } from '../ui/events';
@@ -9,14 +9,14 @@ import { hideBooksLoading, hideMoviesLoading, hideMusicLoading, hideSeriesLoadin
 export async function loadTrendingContent() {
     loadTrendingMovies();
     loadTrendingSeries();
-    loadMusic('happy'); // временно
-    loadBooks('happy');
+    loadTrendingMusic();
+    loadTrendingBooks();
 }
 export async function loadTrendingMovies() {
     try {
         renderer.renderMoviesSkeleton();
 
-        const movies = await getTrendingMovies();
+        const movies = await getTrendingMovies(10);
 
         renderer.renderMovies(movies);
 
@@ -34,6 +34,31 @@ export async function loadTrendingSeries() {
 
     } catch (e) {
         renderer.showError('Ошибка сериалов');
+    }
+}
+export async function loadTrendingBooks() {
+    try {
+        renderer.renderBooksSkeleton();
+
+        const books = await getTrendingBooks(3);
+
+        renderer.renderBooks(books);
+
+    } catch (e) {
+        renderer.showError('Ошибка книг');
+    }
+}
+
+export async function loadTrendingMusic() {
+    try {
+        renderer.renderMusicSkeleton();
+
+        const music = await getTrendingMusic(5);
+
+        renderer.renderMusic(music);
+
+    } catch (e) {
+        renderer.showError('Ошибка музыки');
     }
 }
 
