@@ -38,5 +38,11 @@ export default {
     booksError: "Помилка книг",
     musicError: "Помилка музики",
     noDescription: "Опис недоступний",
-    unknownAuthor: "Невідомий автор"
+    unknownAuthor: "Невідомий автор",
+    trending: "Популярні",
+    noFavoriteMovies: "Поки що немає улюблених фільмів",
+    noFavoriteSeries: "Поки що немає улюблених серіалів",
+    noFavoriteMusic: "Поки що немає улюбленої музики",
+    noFavoriteBooks: "Поки що немає улюблених книг",
+    creator: "Автор"
 };

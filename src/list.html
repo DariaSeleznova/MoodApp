@@ -8,13 +8,18 @@
 </head>
 
 <body>
-    <h1 id="page-title" data-i18n="loading">Loading...</h1>
+    <a href="index.html" class="back-logo"><img src="./assets/icons/logo.png" alt="Back to home"></a>
+    <h1 id="page-title">Loading...</h1>
 
     <div id="list-container"></div>
 
-    <a href="index.html" data-i18n="back">← Back</a>
+    <button id="scroll-to-top" class="scroll-to-top">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7 14l5-5 5 5z" />
+        </svg>
+    </button>
 
-    <script type="module" src="./js/list.js"></script>
+
 </body>
 
 </html>

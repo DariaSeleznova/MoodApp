@@ -1,6 +1,7 @@
 import '../styles/main.scss';
 import { getFavorites, removeFromFavorites } from './services/favoritesService';
 import { updateTexts } from '../js/i18n/i18n.js';
+import logo from '../assets/icons/logo.png';
 
 const favorites = getFavorites();
 
@@ -14,19 +15,19 @@ function renderFavorites(list, containerId) {
     container.innerHTML = '';
 
     if (!list.length) {
-        const typeLabels = {
-            movie: 'movies',
-            series: 'series',
-            music: 'music',
-            book: 'books'
+        const emptyMessages = {
+            movie: 'noFavoriteMovies',
+            series: 'noFavoriteSeries',
+            music: 'noFavoriteMusic',
+            book: 'noFavoriteBooks'
         };
 
         const type = containerId.replace('fav-', '');
-        const label = typeLabels[type] || 'items';
+        const key = emptyMessages[type];;
 
         container.innerHTML = `
         <div class="empty-state">
-            <p data-i18n="noFavoritesYet">😢 You have no favorite ${label} yet</p>
+            <p data-i18n="noFavoritesYet">😢 ${key}</p>
             <a href="index.html" data-i18n="goExplore">Go explore →</a>
         </div>
     `;
@@ -52,9 +53,8 @@ function renderFavorites(list, containerId) {
             </div>
 
             <div class="fav-card__actions">
-                <a href="${item.link}" target="_blank" class="fav-btn" data-i18n="trailer">
-  ▶ Trailer
-</a>
+               ${item.link ? `
+                <a href="${item.link}" target="_blank" class="movie-card__action" data-i18n="trailer"> ▶ Trailer </a>` : ''}
 
                 <button class="fav-btn remove-btn">❌</button>
             </div>
@@ -76,3 +76,6 @@ renderFavorites(music, 'fav-music');
 renderFavorites(books, 'fav-books');
 
 updateTexts();
+
+const backLogo = document.querySelector('.back-logo img');
+if (backLogo) backLogo.src = logo;

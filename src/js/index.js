@@ -24,7 +24,12 @@ document.querySelectorAll('.mood-btn').forEach((btn) => {
     img.src = moodImages[mood];
     img.alt = mood;
 
+    const text = document.createElement('span');
+    text.setAttribute('data-i18n', mood);
+    text.classList.add('mood-text');
+
     btn.appendChild(img);
+    btn.appendChild(text);
 
 });
 

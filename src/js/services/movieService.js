@@ -1,9 +1,10 @@
 import { getApiLanguage } from '../i18n/i18n';
 const API_KEY = process.env.TMDB_TOKEN;
 const BASE_URL = 'https://api.themoviedb.org/3';
-const language = getApiLanguage();
+
 
 export async function getTrendingMovies(limit = 10) {
+    const language = getApiLanguage();
     const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=${language}`;
 
     const res = await fetch(url);
@@ -13,6 +14,7 @@ export async function getTrendingMovies(limit = 10) {
 }
 
 export async function getMoviesByMood(mood, limit = 10) {
+    const language = getApiLanguage();
     const genreMap = {
         happy: [35, 10749, 28, 12, 14],
         sad: [18, 36, 10402, 53],
@@ -45,6 +47,7 @@ export async function getMoviesByMood(mood, limit = 10) {
 }
 
 export async function getTrendingSeries() {
+    const language = getApiLanguage();
     const url = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}`;
 
     const res = await fetch(url);
@@ -54,6 +57,7 @@ export async function getTrendingSeries() {
 }
 
 export async function getSeriesByMood(mood, limit = 10) {
+    const language = getApiLanguage();
     const genreMap = {
         happy: [35],
         sad: [18],
@@ -80,6 +84,7 @@ export async function getSeriesByMood(mood, limit = 10) {
     return data.results.slice(0, limit);
 }
 export async function getMovieGenres() {
+    const language = getApiLanguage();
     const url = `${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=${language}`;
 
     const res = await fetch(url);

@@ -38,5 +38,11 @@ export default {
     booksError: "Books error",
     musicError: "Music error",
     noDescription: "No description available",
-    unknownAuthor: "Unknown author"
+    unknownAuthor: "Unknown author",
+    trending: "Trending",
+    noFavoriteMovies: "No favorite movies yet",
+    noFavoriteSeries: "No favorite series yet",
+    noFavoriteMusic: "No favorite music yet",
+    noFavoriteBooks: "No favorite books yet",
+    creator: "Creator"
 };
