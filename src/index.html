@@ -20,51 +20,53 @@
             <button class="mood-btn" data-mood="sad"></button>
         </nav>
         <div class="client-area">
-            <button class="login-btn">Login</button>
-            <button class="signup-btn">Sign Up</button>
+            <button class="login-btn" data-i18n="login">Login</button>
+            <button class="signup-btn" data-i18n="signup">Sign Up</button>
             <select name="" id="lang-switch">
-                <option value="en">English</option>
-                <option value="uk">Українська</option>
+                <option value="en" data-lang="en">English</option>
+                <option value="uk" data-lang="uk">Українська</option>
+                <option value="pl" data-lang="pl">Polski</option>
+                <option value="es" data-lang="es">Español</option>
             </select>
-            <a href="favorites.html" class="favorites-link">❤️ Favorites</a>
+            <a href="favorites.html" class="favorites-link" data-i18n="favorites">❤️ Favorites</a>
         </div>
     </header>
     <div class="title_app container">
-        <h1>Выбери свое настроение</h1>
+        <h1 data-i18n="chooseYourMood">Выбери свое настроение</h1>
     </div>
     <div class="app container">
         <section class="movies">
-            <h2>Movies</h2>
+            <h2 data-i18n="movies">Movies</h2>
             <div id="movies-list"></div>
             <div class="controls">
                 <button id="prev-movie">←</button>
                 <button id="next-movie">→</button>
                 <div class="movies-loader hidden"></div>
-                <a class="more-link" data-type="movies" href="#">More...</a>
+                <a class="more-link" data-type="movies" href="#" data-i18n="more">More...</a>
             </div>
         </section>
         <section class="series">
-            <h2>Series</h2>
+            <h2 data-i18n="series">Series</h2>
             <div id="series-list"></div>
             <div class="controls">
                 <button id="prev-series">←</button>
                 <button id="next-series">→</button>
                 <div class="series-loader hidden"></div>
-                <a class="more-link" data-type="series" href="#">More...</a>
+                <a class="more-link" data-type="series" href="#" data-i18n="more">More...</a>
             </div>
 
         </section>
         <section class="books">
-            <h2>Books</h2>
+            <h2 data-i18n="books">Books</h2>
             <div id="books-list"></div>
             <div class="books-loader hidden"></div>
-            <a class="more-link" data-type="books" href="#">More...</a>
+            <a class="more-link" data-type="books" href="#" data-i18n="more">More...</a>
         </section>
         <section class="music">
-            <h2>Music</h2>
+            <h2 data-i18n="music">Music</h2>
             <div id="music-list"></div>
             <div class="music-loader hidden"></div>
-            <a class="more-link" data-type="music" href="#">More...</a>
+            <a class="more-link" data-type="music" href="#" data-i18n="more">More...</a>
         </section>
     </div>
 

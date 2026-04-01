@@ -1,4 +1,7 @@
+import { getBooksLanguage } from "../i18n/i18n";
+
 const API_KEY = process.env.GOOGLE_KEY;
+const lang = getBooksLanguage();
 
 export async function getBooksByMood(mood, limit = 3) {
     const queryMap = {
@@ -13,7 +16,7 @@ export async function getBooksByMood(mood, limit = 3) {
     const query = queryMap[mood] || 'popular2026 books';
 
 
-    const url = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=${limit}&key=${API_KEY}`;
+    const url = `https://www.googleapis.com/books/v1/volumes?q=subject:${encodeURIComponent(query)}&langRestrict=${lang}&maxResults=${limit}&key=${API_KEY}`;
 
     const res = await fetch(url);
     if (!res.ok) {

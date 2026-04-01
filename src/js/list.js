@@ -4,6 +4,8 @@ import { getSeriesByMood, getTrendingSeries } from './services/movieService';
 import { getBooksByMood, getTrendingBooks } from './services/bookService';
 import { getMusicByMood, getTrendingMusic } from './services/musicService';
 import { toggleFavorite, isFavorite } from './services/favoritesService';
+import { updateTexts } from './i18n/i18n.js';
+import { translate } from './i18n/i18n.js';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -58,6 +60,8 @@ async function loadList() {
 }
 loadList();
 
+updateTexts();
+
 const container = document.getElementById('list-container');
 
 function renderMoviesList(movies) {
@@ -82,7 +86,7 @@ function renderMoviesList(movies) {
             <div class="list-card__info">
                 <h3>${movie.title}</h3>
                 <p>⭐ ${movie.vote_average}</p>
-                <p>${movie.overview || 'No overview available.'}</p>
+                <p>${movie.overview || translate('noDescription')}</p>
                 <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
                   <svg class="heart" viewBox="0 0 32 32">
                     <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>

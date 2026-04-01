@@ -1,9 +1,10 @@
-
+import { getApiLanguage } from '../i18n/i18n';
 const API_KEY = process.env.TMDB_TOKEN;
 const BASE_URL = 'https://api.themoviedb.org/3';
+const language = getApiLanguage();
 
 export async function getTrendingMovies(limit = 10) {
-    const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}`;
+    const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=${language}`;
 
     const res = await fetch(url);
     const data = await res.json();
@@ -30,7 +31,7 @@ export async function getMoviesByMood(mood, limit = 10) {
 
     const genreId = getRandomGenres(mood);
 
-    const url = `${BASE_URL}/discover/movie?api_key=${process.env.TMDB_TOKEN}&with_genres=${genreId}&language=en-US`;
+    const url = `${BASE_URL}/discover/movie?api_key=${process.env.TMDB_TOKEN}&with_genres=${genreId}&language=${language}`;
 
     const response = await fetch(url);
 
@@ -62,20 +63,11 @@ export async function getSeriesByMood(mood, limit = 10) {
         tired: [10765],
         spirited: [10759],
     };
-    // {
-    //   10759: "Action & Adventure",
-    //   16: "Animation",
-    //   35: "Comedy",
-    //   18: "Drama",
-    //   10765: "Sci-Fi & Fantasy",
-    //   9648: "Mystery",
-    //   10768: "War & Politics",
-    //   37: "Western"
-    // }
+
     const genreId = genreMap[mood] || 35;
     console.log('Series Mood:', mood, 'Genre ID:', genreId);
 
-    const url = `${BASE_URL}/discover/tv?api_key=${process.env.TMDB_TOKEN}&with_genres=${genreId}&language=en-US`;
+    const url = `${BASE_URL}/discover/tv?api_key=${process.env.TMDB_TOKEN}&with_genres=${genreId}&language=${language}`;
 
     const response = await fetch(url);
 
@@ -88,7 +80,7 @@ export async function getSeriesByMood(mood, limit = 10) {
     return data.results.slice(0, limit);
 }
 export async function getMovieGenres() {
-    const url = `${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=ru-RU`;
+    const url = `${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=${language}`;
 
     const res = await fetch(url);
     const data = await res.json();

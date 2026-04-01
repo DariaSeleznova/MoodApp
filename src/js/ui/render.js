@@ -1,4 +1,7 @@
 import { toggleFavorite, isFavorite } from '../services/favoritesService';
+import { translate, getApiLanguage } from '../../js/i18n/i18n.js';
+
+const API_KEY = process.env.TMDB_TOKEN;
 
 let currentIndex = 0;
 let moviesData = [];
@@ -11,21 +14,26 @@ export function renderMovies(movies) {
     showMovie();
 }
 
-function showMovie() {
+async function showMovie() {
     const container = document.getElementById('movies-list');
+
     container.innerHTML = '';
     if (!moviesData || moviesData.length === 0) {
-        container.innerHTML = '<p>No movies found</p>';
+        container.innerHTML = '<p data-i18n="noMoviesFound">No movies found</p>';
         return;
     }
 
-
     const movie = moviesData[currentIndex];
+
+    const credits = await getMovieCredits(movie.id);
 
     const imageUrl = movie.poster_path
         ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
         : '';
 
+
+    const director = credits.crew?.find(p => p.job === 'Director');
+    const actors = credits.cast?.slice(0, 3).map(a => a.name).join(', ');
     const card = document.createElement('div');
     card.classList.add('movie-card', 'fade-in');
 
@@ -40,11 +48,21 @@ function showMovie() {
     <p class="movie-card__rating">⭐ ${movie.vote_average}</p>
 
     <p class="movie-card__description">
-      ${movie.overview || 'No description available'}...
+      ${movie.overview || translate('noDescription')}...
+    </p>
+   <p class="movie-card__meta">
+      <span data-i18n="director"></span>: 🎬 ${director ? director.name : '—'}
+   </p>
+
+    <p class="movie-card__meta">
+    <span data-i18n="cast"></span>: 🎭 ${actors || '—'}
     </p>
 
+    <p class="movie-card__meta">
+    <span data-i18n="release"></span>: 📅 ${movie.release_date || '—'}
+    </p>
     <div class="movie-card__actions">
-      <button class="btn-trailer">▶ Trailer</button>
+      <button class="btn-trailer" data-i18n="trailer">▶ Trailer</button>
     </div>
    <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -71,6 +89,16 @@ function showMovie() {
 
     container.appendChild(card);
 }
+async function getMovieCredits(movieId) {
+    const language = getApiLanguage();
+
+    const res = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${API_KEY}&language=${language}`
+    );
+
+    const data = await res.json();
+    return data;
+}
 
 export function nextMovie() {
     if (currentIndex < moviesData.length - 1) {
@@ -95,16 +123,23 @@ export function renderSeries(series) {
     showSeries();
 }
 
-function showSeries() {
+async function showSeries() {
     const container = document.getElementById('series-list');
     container.innerHTML = '';
     if (!seriesData || seriesData.length === 0) {
-        container.innerHTML = '<p>No series found</p>';
+        container.innerHTML = '<p data-i18n="noSeriesFound">No series found</p>';
         return;
     }
 
 
     const show = seriesData[currentSeriesIndex];
+
+    const credit = await getSeriesCredits(show.id);
+
+    const actors = credit.cast?.slice(0, 3).map(a => a.name).join(', ');
+    const creator = credit.created_by?.[0]?.name;
+    const years = credit.first_air_date?.split('-')[0];
+    const seasons = credit.number_of_seasons;
 
     const imageUrl = show.poster_path
         ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
@@ -121,9 +156,21 @@ function showSeries() {
     <h2>${show.name}</h2>
     
     <p>⭐ ${show.vote_average}</p>
-    <p>${show.overview?.slice(0, 120) || 'No description available'}...</p>
+    <p>${show.overview || translate('noDescription')}</p>
+    <p class = serials-card_meta>
+    <span data-i18n="creator"></span>: 🎬 ${creator ? creator.name : '—'} 
+    </p>
+    <p class = serials-card_meta>
+    🎭 ${actors || '—'}
+    </p>
+    <p class = serials-card_meta>
+    📅 ${years || '—'}
+    </p>
+    <p class = serials-card_meta>
+    ${seasons} seasons
+    </p>
     <div class="series-card__actions">
-      <button class="btn-trailer">▶ Trailer</button>
+      <button class="btn-trailer" data-i18n="trailer">▶ Trailer</button>
     </div>
     <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -149,6 +196,17 @@ function showSeries() {
     });
 
     container.appendChild(card);
+}
+
+async function getSeriesCredits(tvId) {
+    const language = getApiLanguage();
+    const res = await fetch(
+        `https://api.themoviedb.org/3/tv/${tvId}?api_key=${API_KEY}&language=${language}`
+    );
+
+    const data = await res.json();
+    return data;
+
 }
 
 export function nextSeries() {
@@ -194,7 +252,7 @@ export function renderMusic(tracks) {
                 <p class="music-card__title">${track.name}</p>
                 <p class="music-card__artist">${track.artist.name}</p>
 
-                <a href="${track.url}" target="_blank" class="music-card__btn">
+                <a href="${track.url}" target="_blank" class="music-card__btn" data-i18n="listen">
                     ▶ Listen
                 </a>
                 <button class="btn-fav ${isFavorite(track.id) ? 'active' : ''}">
@@ -231,7 +289,7 @@ export function renderBooks(books) {
         const info = book.volumeInfo;
 
         const title = info.title;
-        const authors = info.authors?.join(', ') || 'Unknown author';
+        const authors = info.authors?.join(', ') || translate('unknownAuthor');
         const link = info.previewLink;
         const image = info.imageLinks?.thumbnail;
 
@@ -250,7 +308,7 @@ export function renderBooks(books) {
                 <p class="book-card__title">${title}</p>
                 <p class="book-card__author">${authors}</p>
 
-                <a href="${link}" target="_blank" class="book-card__btn">
+                <a href="${link}" target="_blank" class="book-card__btn" data-i18n="preview">
                     📖 Preview
                 </a>
                 <button class="btn-fav ${isFavorite(book.id) ? 'active' : ''}">
@@ -286,10 +344,10 @@ export function hideLoading() {
     document.querySelector('.loader')?.classList.add('hidden');
 }
 
-export function showError(message) {
+export function showError(key) {
     const el = document.querySelector('.error');
     if (el) {
-        el.textContent = message;
+        el.setAttribute("data-i18n", key);
         el.classList.remove('hidden');
     }
 }

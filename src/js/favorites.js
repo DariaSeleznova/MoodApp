@@ -1,5 +1,6 @@
 import '../styles/main.scss';
 import { getFavorites, removeFromFavorites } from './services/favoritesService';
+import { updateTexts } from '../js/i18n/i18n.js';
 
 const favorites = getFavorites();
 
@@ -25,8 +26,8 @@ function renderFavorites(list, containerId) {
 
         container.innerHTML = `
         <div class="empty-state">
-            <p>😢 You have no favorite ${label} yet</p>
-            <a href="index.html">Go explore →</a>
+            <p data-i18n="noFavoritesYet">😢 You have no favorite ${label} yet</p>
+            <a href="index.html" data-i18n="goExplore">Go explore →</a>
         </div>
     `;
 
@@ -51,7 +52,7 @@ function renderFavorites(list, containerId) {
             </div>
 
             <div class="fav-card__actions">
-                <a href="${item.link}" target="_blank" class="fav-btn">
+                <a href="${item.link}" target="_blank" class="fav-btn" data-i18n="trailer">
   ▶ Trailer
 </a>
 
@@ -73,3 +74,5 @@ renderFavorites(movies, 'fav-movies');
 renderFavorites(series, 'fav-series');
 renderFavorites(music, 'fav-music');
 renderFavorites(books, 'fav-books');
+
+updateTexts();

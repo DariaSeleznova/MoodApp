@@ -7,6 +7,8 @@ import relaxed from '../assets/icons/relax.png';
 import spirited from '../assets/icons/spirited.png';
 import tired from '../assets/icons/tired.png';
 import logo from '../assets/icons/logo.png';
+import { setLanguage, updateTexts } from '../js/i18n/i18n.js';
+
 const moodImages = {
     happy,
     sad,
@@ -35,4 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     logoImg.src = logo;
+});
+
+const langSwitch = document.getElementById('lang-switch');
+
+langSwitch.addEventListener('change', (e) => {
+    setLanguage(e.target.value);
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateTexts();
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('lang') || 'en';
+    langSwitch.value = savedLang;
+    setLanguage(savedLang);
 });

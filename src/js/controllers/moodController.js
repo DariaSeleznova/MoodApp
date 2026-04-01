@@ -21,7 +21,7 @@ export async function loadTrendingMovies() {
         renderer.renderMovies(movies);
 
     } catch (e) {
-        renderer.showError('Ошибка фильмов');
+        renderer.showError('moviesError');
     }
 }
 export async function loadTrendingSeries() {
@@ -33,7 +33,7 @@ export async function loadTrendingSeries() {
         renderer.renderSeries(series);
 
     } catch (e) {
-        renderer.showError('Ошибка сериалов');
+        renderer.showError('seriesError');
     }
 }
 export async function loadTrendingBooks() {
@@ -45,7 +45,7 @@ export async function loadTrendingBooks() {
         renderer.renderBooks(books);
 
     } catch (e) {
-        renderer.showError('Ошибка книг');
+        renderer.showError('booksError');
     }
 }
 
@@ -58,7 +58,7 @@ export async function loadTrendingMusic() {
         renderer.renderMusic(music);
 
     } catch (e) {
-        renderer.showError('Ошибка музыки');
+        renderer.showError('musicError');
     }
 }
 
@@ -84,7 +84,7 @@ export async function loadMovies(mood) {
         renderer.renderMovies(movies);
 
     } catch (e) {
-        renderer.showError('Ошибка фильмов');
+        renderer.showError('moviesError');
     } finally {
         hideMoviesLoading();
     }
@@ -97,7 +97,7 @@ export async function loadSeries(mood) {
         const series = await getSeriesByMood(mood);
         renderer.renderSeries(series);
     } catch (e) {
-        renderer.showError('Ошибка сериалов');
+        renderer.showError('seriesError');
     }
     finally {
         hideSeriesLoading();
@@ -111,7 +111,7 @@ export async function loadBooks(mood) {
         const books = await getBooksByMood(mood);
         renderer.renderBooks(books);
     } catch (e) {
-        renderer.showError('Ошибка книг');
+        renderer.showError('booksError');
     }
     finally {
         hideBooksLoading();
@@ -125,7 +125,7 @@ export async function loadMusic(mood) {
         const music = await getMusicByMood(mood);
         renderer.renderMusic(music);
     } catch (e) {
-        renderer.showError('Ошибка музыки');
+        renderer.showError('musicError');
     }
     finally {
         hideMusicLoading();
