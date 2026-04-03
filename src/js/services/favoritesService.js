@@ -1,31 +1,62 @@
+import { ensureUserDocument, getUserFavorites, saveUserFavorites } from './userDataService.js';
+
+const FAVORITES_STORAGE_KEY = 'favorites';
+
+function readFavorites() {
+    return JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY)) || [];
+}
+
+function writeFavorites(favorites) {
+    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+}
+
 export function isFavorite(id) {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    return favorites.some(item => item.id === id);
+    return readFavorites().some(item => item.id === id);
 }
 
 export function getFavorites() {
-    return JSON.parse(localStorage.getItem('favorites')) || [];
+    return readFavorites();
 }
 
-export function toggleFavorite(item) {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-    const exists = favorites.some(fav => fav.id === item.id);
-
-    let updated;
-
-    if (exists) {
-        updated = favorites.filter(fav => fav.id !== item.id);
-    } else {
-        updated = [...favorites, item];
+export async function syncFavoritesForUser(user) {
+    if (!user) {
+        writeFavorites([]);
+        return [];
     }
 
-    localStorage.setItem('favorites', JSON.stringify(updated));
+    await ensureUserDocument(user);
+    const favorites = await getUserFavorites(user.uid);
+    writeFavorites(favorites);
+    return favorites;
 }
-export function removeFromFavorites(id) {
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
 
+export async function toggleFavorite(item, user = null) {
+    const favorites = readFavorites();
+    const exists = favorites.some(fav => fav.id === item.id);
+    const updated = exists
+        ? favorites.filter(fav => fav.id !== item.id)
+        : [...favorites, item];
+
+    writeFavorites(updated);
+
+    if (user) {
+        await ensureUserDocument(user);
+        await saveUserFavorites(user.uid, updated);
+    }
+
+    return updated;
+}
+
+export async function removeFromFavorites(id, user = null) {
+    const favorites = readFavorites();
     const updated = favorites.filter(item => item.id !== id);
 
-    localStorage.setItem('favorites', JSON.stringify(updated));
+    writeFavorites(updated);
+
+    if (user) {
+        await ensureUserDocument(user);
+        await saveUserFavorites(user.uid, updated);
+    }
+
+    return updated;
 }

@@ -1,27 +1,33 @@
-import { toggleFavorite, isFavorite } from '../services/favoritesService';
-import { translate, getApiLanguage, updateTexts } from '../../js/i18n/i18n.js';
+import { isFavorite } from '../services/favoritesService';
+import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
+import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
 
-const API_KEY = process.env.TMDB_TOKEN;
-const movieCache = new Map();
-const seriesCache = new Map();
+const AUTOPLAY_DELAY = 30000;
 
 let currentIndex = 0;
 let moviesData = [];
+let moviesAutoplayId = null;
+let isMoviesHovered = false;
+let moviesHoverBound = false;
 
 // 🎬 фильмы (карусель)
 export function renderMovies(movies) {
     moviesData = movies;
     currentIndex = 0;
 
+    resetMoviesAutoplay();
     showMovie();
 }
 
 async function showMovie() {
     const container = document.getElementById('movies-list');
+    bindMoviesHover(container);
 
     container.innerHTML = '';
     if (!moviesData || moviesData.length === 0) {
+        clearAutoplay(moviesAutoplayId);
+        moviesAutoplayId = null;
         container.innerHTML = '<p data-i18n="noMoviesFound"></p>';
         updateTexts();
         return;
@@ -29,15 +35,16 @@ async function showMovie() {
 
     const movie = moviesData[currentIndex];
 
-    const credits = await getMovieCredits(movie.id);
+    const details = await getMovieDetails(movie.id);
 
     const imageUrl = movie.poster_path
         ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
         : '';
 
 
-    const director = credits.crew?.find(p => p.job === 'Director');
-    const actors = credits.cast?.slice(0, 3).map(a => a.name).join(', ');
+    const director = details.credits?.crew?.find(p => p.job === 'Director');
+    const actors = details.credits?.cast?.slice(0, 3).map(a => a.name).join(', ');
+    const trailerUrl = getTrailerUrl(details.videos?.results);
     const card = document.createElement('div');
     card.classList.add('movie-card', 'fade-in');
 
@@ -66,7 +73,7 @@ async function showMovie() {
     <span data-i18n="release"></span>: 📅 ${movie.release_date || '—'}
     </p>
     <div class="movie-card__actions">
-      <button class="btn-trailer" data-i18n="trailer"></button>
+      <button class="btn btn-primary btn-trailer" data-i18n="trailer"></button>
     </div>
    <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -77,60 +84,116 @@ async function showMovie() {
 `;
 
     const favBtn = card.querySelector('.btn-fav');
+    const trailerBtn = card.querySelector('.btn-trailer');
+
+    setupTrailerButton(trailerBtn, trailerUrl);
 
     setupFavoriteButton(favBtn, {
         id: movie.id,
         title: movie.title,
         image: movie.poster_path,
         type: 'movie',
-        rating: movie.vote_average
+        rating: movie.vote_average,
+        link: trailerUrl || undefined
     });
 
     container.appendChild(card);
     updateTexts();
 }
-async function getMovieCredits(movieId) {
-    if (movieCache.has(movieId)) {
-        return movieCache.get(movieId);
+
+function clearAutoplay(timerId) {
+    if (timerId) {
+        clearInterval(timerId);
     }
-    const language = getApiLanguage();
-
-    const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${movieId}/credits?api_key=${API_KEY}&language=${language}`
-    );
-
-    const data = await res.json();
-    movieCache.set(movieId, data);
-    return data;
 }
 
-export function nextMovie() {
-    if (currentIndex < moviesData.length - 1) {
-        currentIndex++;
-        showMovie();
+function bindHoverAutoplay(container, onEnter, onLeave, isBound) {
+    if (!container || isBound) {
+        return isBound;
     }
+
+    container.addEventListener('mouseenter', onEnter);
+    container.addEventListener('mouseleave', onLeave);
+    container.addEventListener('touchstart', onEnter, { passive: true });
+    container.addEventListener('touchend', onLeave, { passive: true });
+    container.addEventListener('touchcancel', onLeave, { passive: true });
+
+    return true;
+}
+
+function resetMoviesAutoplay() {
+    clearAutoplay(moviesAutoplayId);
+
+    if (moviesData.length <= 1 || isMoviesHovered) {
+        moviesAutoplayId = null;
+        return;
+    }
+
+    moviesAutoplayId = setInterval(() => {
+        nextMovie(false);
+    }, AUTOPLAY_DELAY);
+}
+
+function bindMoviesHover(container) {
+    moviesHoverBound = bindHoverAutoplay(
+        container,
+        () => {
+            isMoviesHovered = true;
+            clearAutoplay(moviesAutoplayId);
+            moviesAutoplayId = null;
+        },
+        () => {
+            isMoviesHovered = false;
+            resetMoviesAutoplay();
+        },
+        moviesHoverBound
+    );
+}
+
+export function nextMovie(resetAutoplay = true) {
+    if (!moviesData.length) {
+        return;
+    }
+
+    currentIndex = (currentIndex + 1) % moviesData.length;
+
+    if (resetAutoplay) {
+        resetMoviesAutoplay();
+    }
+
+    showMovie();
 }
 
 export function prevMovie() {
-    if (currentIndex > 0) {
-        currentIndex--;
-        showMovie();
+    if (!moviesData.length) {
+        return;
     }
+
+    currentIndex = (currentIndex - 1 + moviesData.length) % moviesData.length;
+    resetMoviesAutoplay();
+    showMovie();
 }
 let currentSeriesIndex = 0;
 let seriesData = [];
+let seriesAutoplayId = null;
+let isSeriesHovered = false;
+let seriesHoverBound = false;
 
 export function renderSeries(series) {
     seriesData = series;
     currentSeriesIndex = 0;
 
+    resetSeriesAutoplay();
     showSeries();
 }
 
 async function showSeries() {
     const container = document.getElementById('series-list');
+    bindSeriesHover(container);
     container.innerHTML = '';
     if (!seriesData || seriesData.length === 0) {
+        clearAutoplay(seriesAutoplayId);
+        seriesAutoplayId = null;
         container.innerHTML = '<p data-i18n="noSeriesFound"></p>';
         updateTexts();
         return;
@@ -139,12 +202,13 @@ async function showSeries() {
 
     const show = seriesData[currentSeriesIndex];
 
-    const credit = await getSeriesCredits(show.id);
+    const details = await getSeriesDetails(show.id);
 
-    const actors = credit.cast?.slice(0, 3).map(a => a.name).join(', ');
-    const creator = credit.created_by?.[0]?.name;
-    const years = credit.first_air_date?.split('-')[0];
-    const seasons = credit.number_of_seasons;
+    const actors = details.aggregate_credits?.cast?.slice(0, 3).map(a => a.name).join(', ');
+    const creator = details.created_by?.[0]?.name;
+    const years = details.first_air_date?.split('-')[0];
+    const seasons = details.number_of_seasons;
+    const trailerUrl = getTrailerUrl(details.videos?.results);
 
     const imageUrl = show.poster_path
         ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
@@ -163,7 +227,7 @@ async function showSeries() {
     <p>⭐ ${show.vote_average}</p>
     <p>${show.overview || translate('noDescription')}</p>
     <p class = serials-card_meta>
-    <span data-i18n="creator"></span>: 🎬 ${creator ? creator.name : '—'} 
+    <span data-i18n="creator"></span>: 🎬 ${creator || '—'} 
     </p>
     <p class = serials-card_meta>
     🎭 ${actors || '—'}
@@ -175,7 +239,7 @@ async function showSeries() {
     ${seasons} <span data-i18n="seasonsLabel"></span>
     </p>
     <div class="series-card__actions">
-      <button class="btn-trailer" data-i18n="trailer"></button>
+      <button class="btn btn-primary btn-trailer" data-i18n="trailer"></button>
     </div>
     <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -185,54 +249,90 @@ async function showSeries() {
   </div>
 `;
     const favBtn = card.querySelector('.btn-fav');
+    const trailerBtn = card.querySelector('.btn-trailer');
 
-    favBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+    setupTrailerButton(trailerBtn, trailerUrl);
 
-        toggleFavorite({
-            id: show.id,
-            title: show.name,
-            image: show.poster_path,
-            type: 'series',
-            rating: show.vote_average
-        });
-
-        favBtn.classList.toggle('active');
+    setupFavoriteButton(favBtn, {
+        id: show.id,
+        title: show.name,
+        image: show.poster_path,
+        type: 'series',
+        rating: show.vote_average,
+        link: trailerUrl || undefined
     });
 
     container.appendChild(card);
     updateTexts();
 }
 
-async function getSeriesCredits(tvId) {
-    if (seriesCache.has(tvId)) {
-        return seriesCache.get(tvId);
+function setupTrailerButton(button, trailerUrl) {
+    if (!button) {
+        return;
     }
 
-    const language = getApiLanguage();
-    const res = await fetch(
-        `https://api.themoviedb.org/3/tv/${tvId}?api_key=${API_KEY}&language=${language}`
-    );
+    if (!trailerUrl) {
+        button.remove();
+        return;
+    }
 
-    const data = await res.json();
-    seriesCache.set(tvId, data);
-
-    return data;
-
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.open(trailerUrl, '_blank', 'noopener,noreferrer');
+    });
 }
 
-export function nextSeries() {
-    if (currentSeriesIndex < seriesData.length - 1) {
-        currentSeriesIndex++;
-        showSeries();
+function resetSeriesAutoplay() {
+    clearAutoplay(seriesAutoplayId);
+
+    if (seriesData.length <= 1 || isSeriesHovered) {
+        seriesAutoplayId = null;
+        return;
     }
+
+    seriesAutoplayId = setInterval(() => {
+        nextSeries(false);
+    }, AUTOPLAY_DELAY);
+}
+
+function bindSeriesHover(container) {
+    seriesHoverBound = bindHoverAutoplay(
+        container,
+        () => {
+            isSeriesHovered = true;
+            clearAutoplay(seriesAutoplayId);
+            seriesAutoplayId = null;
+        },
+        () => {
+            isSeriesHovered = false;
+            resetSeriesAutoplay();
+        },
+        seriesHoverBound
+    );
+}
+
+export function nextSeries(resetAutoplay = true) {
+    if (!seriesData.length) {
+        return;
+    }
+
+    currentSeriesIndex = (currentSeriesIndex + 1) % seriesData.length;
+
+    if (resetAutoplay) {
+        resetSeriesAutoplay();
+    }
+
+    showSeries();
 }
 
 export function prevSeries() {
-    if (currentSeriesIndex > 0) {
-        currentSeriesIndex--;
-        showSeries();
+    if (!seriesData.length) {
+        return;
     }
+
+    currentSeriesIndex = (currentSeriesIndex - 1 + seriesData.length) % seriesData.length;
+    resetSeriesAutoplay();
+    showSeries();
 }
 
 export function renderMusic(tracks) {
@@ -275,17 +375,12 @@ export function renderMusic(tracks) {
         `;
         const favBtn = card.querySelector('.btn-fav');
 
-        favBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-
-            toggleFavorite({
-                id: track.url,
-                title: track.name,
-                image: track.image,
-                type: 'music',
-                link: track.url
-            });
-            favBtn.classList.toggle('active');
+        setupFavoriteButton(favBtn, {
+            id: track.url,
+            title: track.name,
+            image: track.image,
+            type: 'music',
+            link: track.url
         });
 
         container.appendChild(card);
@@ -331,20 +426,14 @@ export function renderBooks(books) {
             </div>
         `;
         const favBtn = card.querySelector('.btn-fav');
-
-        favBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // чтобы не триггерить клик по карточке
-
-            toggleFavorite({
-                id: book.id,
-                title: info.title,
-                image: info.imageLinks?.thumbnail,
-                type: 'book',
-                link: info.previewLink
-            });
-
-            favBtn.classList.toggle('active');
+        setupFavoriteButton(favBtn, {
+            id: book.id,
+            title: info.title,
+            image: info.imageLinks?.thumbnail,
+            type: 'book',
+            link: info.previewLink
         });
+
         container.appendChild(card);
     });
 
@@ -407,3 +496,5 @@ export function renderMusicSkeleton() {
         <div class="skeleton-line"></div>
     `;
 }
+
+

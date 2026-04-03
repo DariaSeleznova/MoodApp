@@ -1,6 +1,8 @@
 import { getApiLanguage } from '../i18n/i18n';
 const API_KEY = process.env.TMDB_TOKEN;
 const BASE_URL = 'https://api.themoviedb.org/3';
+const movieDetailsCache = new Map();
+const seriesDetailsCache = new Map();
 
 
 export async function getTrendingMovies(limit = 20) {
@@ -48,7 +50,7 @@ export async function getMoviesByMood(mood, limit = 20) {
 
 export async function getTrendingSeries(limit = 20) {
     const language = getApiLanguage();
-    const url = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}`;
+    const url = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}&language=${language}`;
 
     const res = await fetch(url);
     const data = await res.json();
@@ -91,4 +93,58 @@ export async function getMovieGenres() {
     const data = await res.json();
 
     return data.genres;
+}
+
+async function fetchTmdbDetails(url, cache, cacheKey, errorMessage) {
+    if (cache.has(cacheKey)) {
+        return cache.get(cacheKey);
+    }
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    cache.set(cacheKey, data);
+
+    return data;
+}
+
+export async function getMovieDetails(movieId) {
+    const language = getApiLanguage();
+    const url = `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=${language}&append_to_response=credits,videos`;
+    const cacheKey = `${movieId}-${language}`;
+
+    return fetchTmdbDetails(url, movieDetailsCache, cacheKey, 'Failed to fetch movie details');
+}
+
+export async function getSeriesDetails(seriesId) {
+    const language = getApiLanguage();
+    const url = `${BASE_URL}/tv/${seriesId}?api_key=${API_KEY}&language=${language}&append_to_response=videos,aggregate_credits`;
+    const cacheKey = `${seriesId}-${language}`;
+
+    return fetchTmdbDetails(url, seriesDetailsCache, cacheKey, 'Failed to fetch series details');
+}
+
+export function getTrailerUrl(videos = []) {
+    if (!Array.isArray(videos)) {
+        return null;
+    }
+
+    const preferredTrailer = videos.find(video =>
+        video.site === 'YouTube' &&
+        video.type === 'Trailer' &&
+        video.official
+    );
+
+    const fallbackTrailer = videos.find(video =>
+        video.site === 'YouTube' &&
+        (video.type === 'Trailer' || video.type === 'Teaser')
+    );
+
+    const trailer = preferredTrailer || fallbackTrailer;
+
+    return trailer?.key ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
 }

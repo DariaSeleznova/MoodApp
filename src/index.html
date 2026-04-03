@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MoodApp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -19,50 +23,61 @@
             <button class="mood-btn" data-mood="sad"></button>
         </nav>
         <div class="client-area">
-            <button class="login-btn" data-i18n="login">Login</button>
-            <button class="signup-btn" data-i18n="signup">Sign Up</button>
-            <select name="" id="lang-switch">
-                <option value="en" data-lang="en">English</option>
-                <option value="uk" data-lang="uk">Українська</option>
-                <option value="pl" data-lang="pl">Polski</option>
-                <option value="es" data-lang="es">Español</option>
-            </select>
-            <a href="favorites.html" class="favorites-link" data-i18n="favorites">❤️ Favorites</a>
+            <button class="btn btn-ghost login-btn" data-i18n="login">Login</button>
+            <button class="btn btn-ghost signup-btn" data-i18n="signup">Sign Up</button>
+            <div class="language-switch" id="lang-switch">
+                <button
+                    class="language-switch__trigger"
+                    type="button"
+                    aria-haspopup="menu"
+                    aria-expanded="false"
+                    aria-label="Select language"
+                >
+                    <span class="language-switch__label">EN</span>
+                    <span class="language-switch__chevron" aria-hidden="true">▾</span>
+                </button>
+                <div class="language-switch__menu" role="menu">
+                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="en">English</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="uk">Українська</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="pl">Polski</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="es">Español</button>
+                </div>
+            </div>
         </div>
     </header>
     <div class="title_app container">
-        <h1 data-i18n="chooseYourMood">Выбери свое настроение</h1>
+        <h1 data-i18n="chooseYourMood" class="gradient-text">Выбери свое настроение</h1>
     </div>
     <div class="app container">
         <section class="movies">
-            <h2 data-i18n="movies">Movies</h2>
+            <h2 data-i18n="movies" class="gradient-text">Movies</h2>
             <div id="movies-list"></div>
             <div class="controls">
-                <button id="prev-movie">←</button>
-                <button id="next-movie">→</button>
+                <button id="prev-movie">⇦</button>
+                <button id="next-movie">⇨</button>
                 <div class="movies-loader hidden"></div>
                 <a class="more-link" data-type="movies" href="#" data-i18n="more">More...</a>
             </div>
         </section>
         <section class="series">
-            <h2 data-i18n="series">Series</h2>
+            <h2 data-i18n="series" class="gradient-text">Series</h2>
             <div id="series-list"></div>
             <div class="controls">
-                <button id="prev-series">←</button>
-                <button id="next-series">→</button>
+                <button id="prev-series">⇦</button>
+                <button id="next-series">⇨</button>
                 <div class="series-loader hidden"></div>
                 <a class="more-link" data-type="series" href="#" data-i18n="more">More...</a>
             </div>
 
         </section>
         <section class="books">
-            <h2 data-i18n="books">Books</h2>
+            <h2 data-i18n="books" class="gradient-text">Books</h2>
             <div id="books-list"></div>
             <div class="books-loader hidden"></div>
             <a class="more-link" data-type="books" href="#" data-i18n="more">More...</a>
         </section>
         <section class="music">
-            <h2 data-i18n="music">Music</h2>
+            <h2 data-i18n="music" class="gradient-text">Music</h2>
             <div id="music-list"></div>
             <div class="music-loader hidden"></div>
             <a class="more-link" data-type="music" href="#" data-i18n="more">More...</a>

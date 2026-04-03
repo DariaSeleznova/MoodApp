@@ -1,19 +1,31 @@
 import '../styles/main.scss';
-import { getMoviesByMood, getTrendingMovies } from './services/movieService';
-import { getSeriesByMood, getTrendingSeries } from './services/movieService';
+import {
+    getMoviesByMood,
+    getTrendingMovies,
+    getSeriesByMood,
+    getTrendingSeries,
+    getMovieDetails,
+    getSeriesDetails,
+    getTrailerUrl
+} from './services/movieService';
 import { getBooksByMood, getTrendingBooks } from './services/bookService';
 import { getMusicByMood, getTrendingMusic } from './services/musicService';
-import { toggleFavorite, isFavorite } from './services/favoritesService';
+import { isFavorite } from './services/favoritesService';
 import { setupFavoriteButton } from './utils/favoriteHandler.js';
-import { updateTexts } from './i18n/i18n.js';
-import { translate } from './i18n/i18n.js';
+import { updateTexts, translate } from './i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
+import { initAuthModal } from './ui/authModal.js';
+import { initAuthState } from './services/authService.js';
 
 const params = new URLSearchParams(window.location.search);
 
 const type = params.get('type');
 const mood = params.get('mood') || null;
 const title = document.getElementById('page-title');
+const container = document.getElementById('list-container');
+
+initAuthState();
+initAuthModal();
 
 async function loadList() {
     const listConfig = {
@@ -57,14 +69,13 @@ async function loadList() {
         data = await config.loadTrending(20);
     }
 
-    config.render(data);
-
+    await config.render(data);
 }
+
 loadList();
 
 updateTexts();
 
-// Set the title after translations are loaded
 title.textContent = mood
     ? `${translate(mood)} ${translate(type)}`
     : `${translate('trending')} ${translate(type)}`;
@@ -72,7 +83,6 @@ title.textContent = mood
 const backLogo = document.querySelector('.back-logo img');
 if (backLogo) backLogo.src = logo;
 
-// Scroll to top functionality
 const scrollToTopBtn = document.getElementById('scroll-to-top');
 
 function toggleScrollToTopButton() {
@@ -93,12 +103,28 @@ function scrollToTop() {
 scrollToTopBtn.addEventListener('click', scrollToTop);
 window.addEventListener('scroll', toggleScrollToTopButton);
 
-const container = document.getElementById('list-container');
-
-function renderMoviesList(movies) {
+async function renderMoviesList(movies) {
     container.innerHTML = '';
 
-    movies.forEach(movie => {
+    const moviesWithTrailers = await Promise.all(
+        movies.map(async (movie) => {
+            try {
+                const details = await getMovieDetails(movie.id);
+
+                return {
+                    movie,
+                    trailerUrl: getTrailerUrl(details.videos?.results)
+                };
+            } catch (error) {
+                return {
+                    movie,
+                    trailerUrl: null
+                };
+            }
+        })
+    );
+
+    moviesWithTrailers.forEach(({ movie, trailerUrl }) => {
         const card = document.createElement('div');
         card.classList.add('list-card');
 
@@ -118,30 +144,59 @@ function renderMoviesList(movies) {
                 <h3>${movie.title}</h3>
                 <p>⭐ ${movie.vote_average}</p>
                 <p>${movie.overview || translate('noDescription')}</p>
-                <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
-                  <svg class="heart" viewBox="0 0 32 32">
-                    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
-                  </svg>
-                </button>
+                <div class="list-card__actions">
+                    ${trailerUrl ? '<button class="btn btn-primary btn-trailer" data-i18n="trailer"></button>' : ''}
+                    <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
+                      <svg class="heart" viewBox="0 0 32 32">
+                        <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
+                      </svg>
+                    </button>
+                </div>
             </div>
         `;
+
         const favBtn = card.querySelector('.btn-fav');
+        const trailerBtn = card.querySelector('.btn-trailer');
+
+        setupTrailerButton(trailerBtn, trailerUrl);
 
         setupFavoriteButton(favBtn, {
             id: movie.id,
             title: movie.title,
             image: movie.poster_path,
             type: 'movie',
-            rating: movie.vote_average
+            rating: movie.vote_average,
+            link: trailerUrl || undefined
         });
 
         container.appendChild(card);
     });
+
+    updateTexts();
 }
-function renderSeriesList(series) {
+
+async function renderSeriesList(series) {
     container.innerHTML = '';
 
-    series.forEach(show => {
+    const seriesWithTrailers = await Promise.all(
+        series.map(async (show) => {
+            try {
+                const details = await getSeriesDetails(show.id);
+
+                return {
+                    show,
+                    trailerUrl: getTrailerUrl(details.videos?.results)
+                };
+            } catch (error) {
+                return {
+                    show,
+                    trailerUrl: null
+                };
+            }
+        })
+    );
+
+    seriesWithTrailers.forEach(({ show, trailerUrl }) => {
         const card = document.createElement('div');
         card.classList.add('list-card');
 
@@ -152,37 +207,44 @@ function renderSeriesList(series) {
         card.innerHTML = `
             <div class="list-card__image">
                 ${imageUrl
-                ? `<img src="${imageUrl}" />`
+                ? `<img src="${imageUrl}" alt="${show.name}" />`
                 : `<div class="list-card__placeholder">📺</div>`}
             </div>
 
             <div class="list-card__info">
                 <h3>${show.name}</h3>
                 <p>⭐ ${show.vote_average}</p>
-                <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
-                  <svg class="heart" viewBox="0 0 32 32">
-                    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
-                  </svg>
-                </button>
-
+                <div class="list-card__actions">
+                    ${trailerUrl ? '<button class="btn btn-primary btn-trailer" data-i18n="trailer"></button>' : ''}
+                    <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
+                      <svg class="heart" viewBox="0 0 32 32">
+                        <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
+                      </svg>
+                    </button>
+                </div>
             </div>
-
-               
         `;
 
         const favBtn = card.querySelector('.btn-fav');
+        const trailerBtn = card.querySelector('.btn-trailer');
+
+        setupTrailerButton(trailerBtn, trailerUrl);
 
         setupFavoriteButton(favBtn, {
             id: show.id,
-            title: show.title,
+            title: show.name,
             image: show.poster_path,
             type: 'series',
-            rating: show.vote_average
+            rating: show.vote_average,
+            link: trailerUrl || undefined
         });
 
         container.appendChild(card);
     });
+
+    updateTexts();
 }
+
 function renderMusicList(tracks) {
     container.innerHTML = '';
 
@@ -224,6 +286,7 @@ function renderMusicList(tracks) {
         container.appendChild(card);
     });
 }
+
 function renderBooksList(books) {
     container.innerHTML = '';
 
@@ -262,5 +325,16 @@ function renderBooksList(books) {
         });
 
         container.appendChild(card);
+    });
+}
+
+function setupTrailerButton(button, trailerUrl) {
+    if (!button || !trailerUrl) {
+        return;
+    }
+
+    button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.open(trailerUrl, '_blank', 'noopener,noreferrer');
     });
 }

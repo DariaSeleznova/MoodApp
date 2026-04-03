@@ -1,14 +1,8 @@
 import '../styles/main.scss';
 import { getFavorites, removeFromFavorites } from './services/favoritesService';
+import { getCurrentUser, initAuthState, subscribeToAuthState } from './services/authService.js';
 import { updateTexts } from '../js/i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
-
-const favorites = getFavorites();
-
-const movies = favorites.filter(item => item.type === 'movie');
-const series = favorites.filter(item => item.type === 'series');
-const music = favorites.filter(item => item.type === 'music');
-const books = favorites.filter(item => item.type === 'book');
 
 function renderFavorites(list, containerId) {
     const container = document.getElementById(containerId);
@@ -68,10 +62,10 @@ function renderFavorites(list, containerId) {
         `;
         const removeBtn = card.querySelector('.remove-btn');
 
-        removeBtn.addEventListener('click', (e) => {
+        removeBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
 
-            removeFromFavorites(item.id);
+            await removeFromFavorites(item.id, getCurrentUser());
 
             const updatedList = getFavorites().filter(i => i.type === item.type);
 
@@ -83,10 +77,21 @@ function renderFavorites(list, containerId) {
         container.appendChild(card);
     });
 }
-renderFavorites(movies, 'fav-movies');
-renderFavorites(series, 'fav-series');
-renderFavorites(music, 'fav-music');
-renderFavorites(books, 'fav-books');
+
+function renderAllFavorites() {
+    const favorites = getFavorites();
+
+    renderFavorites(favorites.filter(item => item.type === 'movie'), 'fav-movies');
+    renderFavorites(favorites.filter(item => item.type === 'series'), 'fav-series');
+    renderFavorites(favorites.filter(item => item.type === 'music'), 'fav-music');
+    renderFavorites(favorites.filter(item => item.type === 'book'), 'fav-books');
+}
+
+initAuthState();
+renderAllFavorites();
+subscribeToAuthState(() => {
+    renderAllFavorites();
+});
 
 updateTexts();
 

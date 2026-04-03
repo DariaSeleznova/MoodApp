@@ -42,9 +42,10 @@ export function getApiLanguage() {
 const googleLangMap = {
     en: 'en',
     uk: 'uk',
-    pl: 'pl'
+    pl: 'pl',
+    es: 'es'
 };
 
 export function getBooksLanguage() {
-    return googleLangMap[currentLanguage];
+    return googleLangMap[currentLanguage] || 'en';
 }

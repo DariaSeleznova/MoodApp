@@ -23,13 +23,39 @@ moodButtons.forEach((btn) => {
 
 let currentMood = null;
 async function handleMoodChange(mood) {
-    console.log('Mood selected:', mood);
     currentMood = mood;
+    setActiveMoodButton(mood);
+    applyMoodClass(mood);
     loadMovies(mood);
     loadSeries(mood);
     loadMusic(mood);
     loadBooks(mood);
 
+    updateMoreLinks();
+}
+
+function applyMoodClass(mood) {
+    const moodClasses = ['happy', 'relaxed', 'excited', 'spirited', 'tired', 'sad']
+        .map(name => `mood-${name}`);
+
+    document.body.classList.remove(...moodClasses);
+
+    if (mood) {
+        document.body.classList.add(`mood-${mood}`);
+    }
+}
+
+function setActiveMoodButton(mood) {
+    moodButtons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.mood === mood);
+    });
+}
+
+export function resetAppState() {
+    currentMood = null;
+    setActiveMoodButton(null);
+    applyMoodClass(null);
+    loadTrendingContent();
     updateMoreLinks();
 }
 

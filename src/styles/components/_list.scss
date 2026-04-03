@@ -18,6 +18,17 @@
     margin: 0;
 }
 
+.list-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.list-card .btn-trailer {
+    min-height: 38px;
+}
+
 // Scroll to top button
 .scroll-to-top {
     position: fixed;
@@ -30,7 +41,7 @@
     border-radius: 50%;
     color: white;
     cursor: pointer;
-    display: none; // Hidden by default
+    display: none;
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
