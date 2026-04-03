@@ -7,7 +7,7 @@ import relaxed from '../assets/icons/relax.png';
 import spirited from '../assets/icons/spirited.png';
 import tired from '../assets/icons/tired.png';
 import logo from '../assets/icons/logo.png';
-import { setLanguage, updateTexts } from '../js/i18n/i18n.js';
+import { setLanguage } from '../js/i18n/i18n.js';
 
 const moodImages = {
     happy,
@@ -33,29 +33,21 @@ document.querySelectorAll('.mood-btn').forEach((btn) => {
 
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const logoImg = document.querySelector('.logo img');
 
-    if (!logoImg) {
-        console.log('❌ logo не найден');
-        return;
+document.addEventListener('DOMContentLoaded', init);
+
+function init() {
+
+    const logoImg = document.querySelector('.logo img');
+    if (logoImg) logoImg.src = logo;
+
+    const savedLang = localStorage.getItem('lang') || 'en';
+
+    const langSwitch = document.getElementById('lang-switch');
+    if (langSwitch) {
+        langSwitch.value = savedLang;
     }
 
-    logoImg.src = logo;
-});
-
-const langSwitch = document.getElementById('lang-switch');
-
-langSwitch.addEventListener('change', (e) => {
-    setLanguage(e.target.value);
-});
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    updateTexts();
-});
-document.addEventListener('DOMContentLoaded', () => {
-    const savedLang = localStorage.getItem('lang') || 'en';
-    langSwitch.value = savedLang;
     setLanguage(savedLang);
-});
+
+}

@@ -22,12 +22,19 @@ function renderFavorites(list, containerId) {
             book: 'noFavoriteBooks'
         };
 
-        const type = containerId.replace('fav-', '');
-        const key = emptyMessages[type];;
+        const typeMap = {
+            'fav-movies': 'movie',
+            'fav-series': 'series',
+            'fav-music': 'music',
+            'fav-books': 'book'
+        };
+
+        const type = typeMap[containerId];
+        const key = emptyMessages[type];
 
         container.innerHTML = `
         <div class="empty-state">
-            <p data-i18n="noFavoritesYet">😢 ${key}</p>
+            <p data-i18n="${key}">😢</p>
             <a href="index.html" data-i18n="goExplore">Go explore →</a>
         </div>
     `;
@@ -65,8 +72,14 @@ function renderFavorites(list, containerId) {
             e.stopPropagation();
 
             removeFromFavorites(item.id);
-            card.remove();
+
+            const updatedList = getFavorites().filter(i => i.type === item.type);
+
+            const containerId = `fav-${item.type}s`;
+
+            renderFavorites(updatedList, containerId);
         });
+
         container.appendChild(card);
     });
 }

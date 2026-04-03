@@ -3,7 +3,7 @@ const API_KEY = process.env.TMDB_TOKEN;
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 
-export async function getTrendingMovies(limit = 10) {
+export async function getTrendingMovies(limit = 20) {
     const language = getApiLanguage();
     const url = `${BASE_URL}/trending/movie/week?api_key=${API_KEY}&language=${language}`;
 
@@ -13,7 +13,7 @@ export async function getTrendingMovies(limit = 10) {
     return data.results.slice(0, limit);
 }
 
-export async function getMoviesByMood(mood, limit = 10) {
+export async function getMoviesByMood(mood, limit = 20) {
     const language = getApiLanguage();
     const genreMap = {
         happy: [35, 10749, 28, 12, 14],
@@ -46,17 +46,17 @@ export async function getMoviesByMood(mood, limit = 10) {
     return data.results.slice(0, limit);
 }
 
-export async function getTrendingSeries() {
+export async function getTrendingSeries(limit = 20) {
     const language = getApiLanguage();
     const url = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}`;
 
     const res = await fetch(url);
     const data = await res.json();
 
-    return data.results.slice(0, 10);
+    return data.results.slice(0, limit);
 }
 
-export async function getSeriesByMood(mood, limit = 10) {
+export async function getSeriesByMood(mood, limit = 20) {
     const language = getApiLanguage();
     const genreMap = {
         happy: [35],
@@ -92,10 +92,3 @@ export async function getMovieGenres() {
 
     return data.genres;
 }
-
-// Call and log the data
-getMovieGenres().then(genres => {
-    console.log('Movie Genres:', genres);
-}).catch(error => {
-    console.error('Error fetching genres:', error);
-});

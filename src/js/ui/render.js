@@ -1,7 +1,10 @@
 import { toggleFavorite, isFavorite } from '../services/favoritesService';
-import { translate, getApiLanguage } from '../../js/i18n/i18n.js';
+import { translate, getApiLanguage, updateTexts } from '../../js/i18n/i18n.js';
+import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 
 const API_KEY = process.env.TMDB_TOKEN;
+const movieCache = new Map();
+const seriesCache = new Map();
 
 let currentIndex = 0;
 let moviesData = [];
@@ -19,7 +22,8 @@ async function showMovie() {
 
     container.innerHTML = '';
     if (!moviesData || moviesData.length === 0) {
-        container.innerHTML = '<p data-i18n="noMoviesFound">No movies found</p>';
+        container.innerHTML = '<p data-i18n="noMoviesFound"></p>';
+        updateTexts();
         return;
     }
 
@@ -62,7 +66,7 @@ async function showMovie() {
     <span data-i18n="release"></span>: 📅 ${movie.release_date || '—'}
     </p>
     <div class="movie-card__actions">
-      <button class="btn-trailer" data-i18n="trailer">▶ Trailer</button>
+      <button class="btn-trailer" data-i18n="trailer"></button>
     </div>
    <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -71,25 +75,24 @@ async function showMovie() {
 </button>
   </div>
 `;
+
     const favBtn = card.querySelector('.btn-fav');
 
-    favBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // чтобы не триггерить клик по карточке
-
-        toggleFavorite({
-            id: movie.id,
-            title: movie.title,
-            image: movie.poster_path,
-            type: 'movie',
-            rating: movie.vote_average
-        });
-
-        favBtn.classList.toggle('active');
+    setupFavoriteButton(favBtn, {
+        id: movie.id,
+        title: movie.title,
+        image: movie.poster_path,
+        type: 'movie',
+        rating: movie.vote_average
     });
 
     container.appendChild(card);
+    updateTexts();
 }
 async function getMovieCredits(movieId) {
+    if (movieCache.has(movieId)) {
+        return movieCache.get(movieId);
+    }
     const language = getApiLanguage();
 
     const res = await fetch(
@@ -97,6 +100,7 @@ async function getMovieCredits(movieId) {
     );
 
     const data = await res.json();
+    movieCache.set(movieId, data);
     return data;
 }
 
@@ -127,7 +131,8 @@ async function showSeries() {
     const container = document.getElementById('series-list');
     container.innerHTML = '';
     if (!seriesData || seriesData.length === 0) {
-        container.innerHTML = '<p data-i18n="noSeriesFound">No series found</p>';
+        container.innerHTML = '<p data-i18n="noSeriesFound"></p>';
+        updateTexts();
         return;
     }
 
@@ -167,10 +172,10 @@ async function showSeries() {
     📅 ${years || '—'}
     </p>
     <p class = serials-card_meta>
-    ${seasons} seasons
+    ${seasons} <span data-i18n="seasonsLabel"></span>
     </p>
     <div class="series-card__actions">
-      <button class="btn-trailer" data-i18n="trailer">▶ Trailer</button>
+      <button class="btn-trailer" data-i18n="trailer"></button>
     </div>
     <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -182,7 +187,7 @@ async function showSeries() {
     const favBtn = card.querySelector('.btn-fav');
 
     favBtn.addEventListener('click', (e) => {
-        e.stopPropagation(); // чтобы не триггерить клик по карточке
+        e.stopPropagation();
 
         toggleFavorite({
             id: show.id,
@@ -196,15 +201,22 @@ async function showSeries() {
     });
 
     container.appendChild(card);
+    updateTexts();
 }
 
 async function getSeriesCredits(tvId) {
+    if (seriesCache.has(tvId)) {
+        return seriesCache.get(tvId);
+    }
+
     const language = getApiLanguage();
     const res = await fetch(
         `https://api.themoviedb.org/3/tv/${tvId}?api_key=${API_KEY}&language=${language}`
     );
 
     const data = await res.json();
+    seriesCache.set(tvId, data);
+
     return data;
 
 }
@@ -253,7 +265,6 @@ export function renderMusic(tracks) {
                 <p class="music-card__artist">${track.artist.name}</p>
 
                 <a href="${track.url}" target="_blank" class="music-card__btn" data-i18n="listen">
-                    ▶ Listen
                 </a>
                 <button class="btn-fav ${isFavorite(track.url) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -265,10 +276,10 @@ export function renderMusic(tracks) {
         const favBtn = card.querySelector('.btn-fav');
 
         favBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // чтобы не триггерить клик по карточке
+            e.stopPropagation();
 
             toggleFavorite({
-                id: track.url, // 🔥 уникальный id (важно!)
+                id: track.url,
                 title: track.name,
                 image: track.image,
                 type: 'music',
@@ -279,6 +290,8 @@ export function renderMusic(tracks) {
 
         container.appendChild(card);
     });
+
+    updateTexts();
 }
 
 export function renderBooks(books) {
@@ -309,7 +322,6 @@ export function renderBooks(books) {
                 <p class="book-card__author">${authors}</p>
 
                 <a href="${link}" target="_blank" class="book-card__btn" data-i18n="preview">
-                    📖 Preview
                 </a>
                 <button class="btn-fav ${isFavorite(book.id) ? 'active' : ''}">
   <svg class="heart" viewBox="0 0 32 32">
@@ -335,6 +347,8 @@ export function renderBooks(books) {
         });
         container.appendChild(card);
     });
+
+    updateTexts();
 }
 export function showLoading() {
     document.querySelector('.loader')?.classList.remove('hidden');
@@ -344,13 +358,18 @@ export function hideLoading() {
     document.querySelector('.loader')?.classList.add('hidden');
 }
 
-export function showError(key) {
-    const el = document.querySelector('.error');
-    if (el) {
-        el.setAttribute("data-i18n", key);
-        el.classList.remove('hidden');
-    }
+export function showError(key, containerId) {
+    const container = document.getElementById(containerId);
+
+    if (!container) return;
+
+    container.innerHTML = `
+        <p class="error" data-i18n="${key}"></p>
+    `;
+
+    updateTexts();
 }
+
 export function renderMoviesSkeleton() {
     const container = document.getElementById('movies-list');
 

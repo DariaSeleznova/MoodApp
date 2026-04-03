@@ -44,5 +44,11 @@ export default {
     noFavoriteSeries: "Aún no tengo series favoritas",
     noFavoriteMusic: "Aún no tengo música favorita",
     noFavoriteBooks: "Aún no tengo libros favoritost",
-    creator: "Creador"
+    creator: "Creador",
+    moviesError: "Error al cargar las películas",
+    seriesError: "Error al cargar las series",
+    booksError: "Error al cargar los libros",
+    musicError: "Error al cargar la música",
+    seasonsLabel: "temporadas",
+    invalidType: "SAlgo salió mal. Por favor, regresa e inténtalo de nuevo."
 };

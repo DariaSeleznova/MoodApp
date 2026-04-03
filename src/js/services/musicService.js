@@ -16,7 +16,7 @@ async function enrichTracksWithDetails(tracks) {
     );
 }
 
-export async function getMusicByMood(mood, limit = 5) {
+export async function getMusicByMood(mood, limit) {
     const tagMap = {
         happy: 'happy',
         sad: 'sad',

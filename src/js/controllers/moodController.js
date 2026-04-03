@@ -6,6 +6,11 @@ import { renderMoviesSkeleton, renderSeriesSkeleton, renderBooksSkeleton, render
 import * as renderer from '../ui/render';
 import { hideBooksLoading, hideMoviesLoading, hideMusicLoading, hideSeriesLoading } from '../ui/events';
 
+let moviesRequestId = 0;
+let seriesRequestId = 0;
+let booksRequestId = 0;
+let musicRequestId = 0;
+
 export async function loadTrendingContent() {
     loadTrendingMovies();
     loadTrendingSeries();
@@ -21,19 +26,19 @@ export async function loadTrendingMovies() {
         renderer.renderMovies(movies);
 
     } catch (e) {
-        renderer.showError('moviesError');
+        renderer.showError('moviesError', 'movies-list');
     }
 }
 export async function loadTrendingSeries() {
     try {
         renderer.renderSeriesSkeleton();
 
-        const series = await getTrendingSeries();
+        const series = await getTrendingSeries(10);
 
         renderer.renderSeries(series);
 
     } catch (e) {
-        renderer.showError('seriesError');
+        renderer.showError('seriesError', 'series-list');
     }
 }
 export async function loadTrendingBooks() {
@@ -45,7 +50,7 @@ export async function loadTrendingBooks() {
         renderer.renderBooks(books);
 
     } catch (e) {
-        renderer.showError('booksError');
+        renderer.showError('booksError', 'books-list');
     }
 }
 
@@ -58,7 +63,7 @@ export async function loadTrendingMusic() {
         renderer.renderMusic(music);
 
     } catch (e) {
-        renderer.showError('musicError');
+        renderer.showError('musicError', 'music-list');
     }
 }
 
@@ -79,12 +84,15 @@ export async function getContentByMood(mood) {
 export async function loadMovies(mood) {
     try {
         renderMoviesSkeleton();
-        const movies = await getMoviesByMood(mood);
+        const requestId = ++moviesRequestId;
+
+        const movies = await getMoviesByMood(mood, 10);
+        if (requestId !== moviesRequestId) return;
 
         renderer.renderMovies(movies);
 
     } catch (e) {
-        renderer.showError('moviesError');
+        renderer.showError('moviesError', 'movies-list');
     } finally {
         hideMoviesLoading();
     }
@@ -93,11 +101,14 @@ export async function loadMovies(mood) {
 export async function loadSeries(mood) {
     try {
         renderSeriesSkeleton();
+        const requestId = ++seriesRequestId;
 
-        const series = await getSeriesByMood(mood);
+        const series = await getSeriesByMood(mood, 10);
+        if (requestId !== seriesRequestId) return;
+
         renderer.renderSeries(series);
     } catch (e) {
-        renderer.showError('seriesError');
+        renderer.showError('seriesError', 'series-list');
     }
     finally {
         hideSeriesLoading();
@@ -107,11 +118,14 @@ export async function loadSeries(mood) {
 export async function loadBooks(mood) {
     try {
         renderBooksSkeleton();
+        const requestId = ++booksRequestId;
 
-        const books = await getBooksByMood(mood);
+        const books = await getBooksByMood(mood, 3);
+        if (requestId !== booksRequestId) return;
+
         renderer.renderBooks(books);
     } catch (e) {
-        renderer.showError('booksError');
+        renderer.showError('booksError', 'books-list');
     }
     finally {
         hideBooksLoading();
@@ -121,11 +135,14 @@ export async function loadBooks(mood) {
 export async function loadMusic(mood) {
     try {
         renderMusicSkeleton();
+        const requestId = ++musicRequestId;
 
-        const music = await getMusicByMood(mood);
+        const music = await getMusicByMood(mood, 5);
+        if (requestId !== musicRequestId) return;
+
         renderer.renderMusic(music);
     } catch (e) {
-        renderer.showError('musicError');
+        renderer.showError('musicError', 'music-list');
     }
     finally {
         hideMusicLoading();

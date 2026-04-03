@@ -4,6 +4,7 @@ import { getSeriesByMood, getTrendingSeries } from './services/movieService';
 import { getBooksByMood, getTrendingBooks } from './services/bookService';
 import { getMusicByMood, getTrendingMusic } from './services/musicService';
 import { toggleFavorite, isFavorite } from './services/favoritesService';
+import { setupFavoriteButton } from './utils/favoriteHandler.js';
 import { updateTexts } from './i18n/i18n.js';
 import { translate } from './i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
@@ -15,46 +16,49 @@ const mood = params.get('mood') || null;
 const title = document.getElementById('page-title');
 
 async function loadList() {
-
-    if (type === 'movies') {
-        if (mood) {
-            const movies = await getMoviesByMood(mood, 30);
-            renderMoviesList(movies);
-        } else {
-            const movies = await getTrendingMovies(30);
-            renderMoviesList(movies);
+    const listConfig = {
+        movies: {
+            loadMood: getMoviesByMood,
+            loadTrending: getTrendingMovies,
+            render: renderMoviesList
+        },
+        series: {
+            loadMood: getSeriesByMood,
+            loadTrending: getTrendingSeries,
+            render: renderSeriesList
+        },
+        books: {
+            loadMood: getBooksByMood,
+            loadTrending: getTrendingBooks,
+            render: renderBooksList
+        },
+        music: {
+            loadMood: getMusicByMood,
+            loadTrending: getTrendingMusic,
+            render: renderMusicList
         }
+    };
+    const config = listConfig[type];
+
+    if (!config) {
+        title.innerHTML = `
+        <p data-i18n="invalidType"></p>
+    `;
+
+        updateTexts();
+        return;
     }
 
-    if (type === 'series') {
-        if (mood) {
-            const series = await getSeriesByMood(mood, 30);
-            renderSeriesList(series);
-        } else {
-            const series = await getTrendingSeries();
-            renderSeriesList(series);
-        }
+    let data;
+
+    if (mood) {
+        data = await config.loadMood(mood, 20);
+    } else {
+        data = await config.loadTrending(20);
     }
 
-    if (type === 'books') {
-        if (mood) {
-            const books = await getBooksByMood(mood, 30);
-            renderBooksList(books);
-        } else {
-            const books = await getTrendingBooks();
-            renderBooksList(books);
-        }
-    }
+    config.render(data);
 
-    if (type === 'music') {
-        if (mood) {
-            const music = await getMusicByMood(mood, 30);
-            renderMusicList(music);
-        } else {
-            const music = await getTrendingMusic(30);
-            renderMusicList(music);
-        }
-    }
 }
 loadList();
 
@@ -123,18 +127,12 @@ function renderMoviesList(movies) {
         `;
         const favBtn = card.querySelector('.btn-fav');
 
-        favBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-
-            toggleFavorite({
-                id: movie.id,
-                title: movie.title,
-                image: movie.poster_path,
-                type: 'movie',
-                rating: movie.vote_average
-            });
-
-            favBtn.classList.toggle('active');
+        setupFavoriteButton(favBtn, {
+            id: movie.id,
+            title: movie.title,
+            image: movie.poster_path,
+            type: 'movie',
+            rating: movie.vote_average
         });
 
         container.appendChild(card);
@@ -174,16 +172,12 @@ function renderSeriesList(series) {
 
         const favBtn = card.querySelector('.btn-fav');
 
-        favBtn.addEventListener('click', () => {
-            toggleFavorite({
-                id: show.id,
-                title: show.name,
-                image: show.poster_path,
-                type: 'series',
-                rating: show.vote_average
-            });
-
-            favBtn.classList.toggle('active');
+        setupFavoriteButton(favBtn, {
+            id: show.id,
+            title: show.title,
+            image: show.poster_path,
+            type: 'series',
+            rating: show.vote_average
         });
 
         container.appendChild(card);
@@ -218,17 +212,14 @@ function renderMusicList(tracks) {
 
         const favBtn = card.querySelector('.btn-fav');
 
-        favBtn.addEventListener('click', () => {
-            toggleFavorite({
-                id: track.url,
-                title: track.name,
-                image: track.image,
-                type: 'music',
-                link: track.url
-            });
-
-            favBtn.classList.toggle('active');
+        setupFavoriteButton(favBtn, {
+            id: track.url,
+            title: track.name,
+            image: track.image,
+            type: 'music',
+            link: track.url
         });
+
 
         container.appendChild(card);
     });
@@ -262,16 +253,12 @@ function renderBooksList(books) {
 
         const favBtn = card.querySelector('.btn-fav');
 
-        favBtn.addEventListener('click', () => {
-            toggleFavorite({
-                id: book.id,
-                title: info.title,
-                image: info.imageLinks?.thumbnail,
-                type: 'book',
-                link: info.previewLink
-            });
-
-            favBtn.classList.toggle('active');
+        setupFavoriteButton(favBtn, {
+            id: book.id,
+            title: info.title,
+            image: info.imageLinks?.thumbnail,
+            type: 'book',
+            link: info.previewLink
         });
 
         container.appendChild(card);

@@ -44,5 +44,11 @@ export default {
     noFavoriteSeries: "No favorite series yet",
     noFavoriteMusic: "No favorite music yet",
     noFavoriteBooks: "No favorite books yet",
-    creator: "Creator"
+    creator: "Creator",
+    moviesError: "Failed to load movies",
+    seriesError: "Failed to load series",
+    booksError: "Failed to load books",
+    musicError: "Failed to load music",
+    seasonsLabel: "seasons",
+    invalidType: "Something went wrong. Please go back and try again."
 };

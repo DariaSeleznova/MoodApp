@@ -44,5 +44,11 @@ export default {
     noFavoriteSeries: "Поки що немає улюблених серіалів",
     noFavoriteMusic: "Поки що немає улюбленої музики",
     noFavoriteBooks: "Поки що немає улюблених книг",
-    creator: "Автор"
+    creator: "Автор",
+    moviesError: "Не вдалося завантажити фільми",
+    seriesError: "Не вдалося завантажити серіали",
+    booksError: "Не вдалося завантажити книги",
+    musicError: "Не вдалося завантажити музику",
+    seasonsLabel: "сезонів",
+    invalidType: "Щось пішло не так. Будь ласка, поверніться та спробуйте ще раз."
 };

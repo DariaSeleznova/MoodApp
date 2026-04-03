@@ -3,7 +3,7 @@ import { getBooksLanguage } from "../i18n/i18n";
 const API_KEY = process.env.GOOGLE_KEY;
 
 
-export async function getBooksByMood(mood, limit = 3) {
+export async function getBooksByMood(mood, limit) {
     const lang = getBooksLanguage();
     const queryMap = {
         happy: 'funny novels',

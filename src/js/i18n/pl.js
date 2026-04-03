@@ -44,5 +44,11 @@ export default {
     noFavoriteSeries: "Brak ulubionych seriali",
     noFavoriteMusic: "Brak ulubionej muzyki",
     noFavoriteBooks: "Brak ulubionych książek",
-    creator: "Twórca"
+    creator: "Twórca",
+    moviesError: "Nie udało się załadować filmóws",
+    seriesError: "Nie udało się załadować serialu",
+    booksError: "Nie udało się załadować książek",
+    musicError: "Nie udało się załadować muzyki",
+    seasonsLabel: "sezonów",
+    invalidType: "Coś poszło nie tak. Wróć i spróbuj ponownie."
 };
