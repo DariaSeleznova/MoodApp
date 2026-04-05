@@ -3,11 +3,12 @@ import {
     onAuthStateChanged,
     signInWithEmailAndPassword,
     signInWithPopup,
-    signOut
+    signOut,
+    updateProfile
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase.js';
 import { ensureUserDocument } from './userDataService.js';
-import { syncFavoritesForUser } from './favoritesService.js';
+import { syncFavoritesForUser, writeFavorites } from './favoritesService.js';
 
 let currentUser = auth.currentUser;
 let pendingAuthAction = null;
@@ -33,9 +34,11 @@ export function initAuthState() {
 
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
+        notifyAuthListeners(user);
         await ensureUserDocument(user);
         await syncFavoritesForUser(user);
-        notifyAuthListeners(user);
+        await runPendingAuthAction();
+
     });
 
     authInitialized = true;
@@ -53,21 +56,21 @@ export function subscribeToAuthState(listener) {
 export async function loginWithEmail(email, password) {
     const result = await signInWithEmailAndPassword(auth, email, password);
     currentUser = result.user;
-    notifyAuthListeners(currentUser);
     return result.user;
 }
 
-export async function signupWithEmail(email, password) {
+export async function signupWithEmail(name, email, password) {
     const result = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(result.user, {
+        displayName: name
+    });
     currentUser = result.user;
-    notifyAuthListeners(currentUser);
     return result.user;
 }
 
 export async function loginWithGoogle() {
     const result = await signInWithPopup(auth, googleProvider);
     currentUser = result.user;
-    notifyAuthListeners(currentUser);
     return result.user;
 }
 
@@ -75,19 +78,21 @@ export async function logout() {
     await signOut(auth);
     currentUser = null;
     pendingAuthAction = null;
-    notifyAuthListeners(currentUser);
+    writeFavorites([]);
+    // window.dispatchEvent(new Event('favoritesUpdated'));
+
 }
 
 export function setPendingAuthAction(action) {
     pendingAuthAction = action;
 }
 
-export function runPendingAuthAction() {
+export async function runPendingAuthAction() {
     if (!pendingAuthAction) {
         return;
     }
 
     const action = pendingAuthAction;
     pendingAuthAction = null;
-    action();
+    await action();
 }

@@ -1,8 +1,11 @@
 import '../styles/main.scss';
 import { getFavorites, removeFromFavorites } from './services/favoritesService';
-import { getCurrentUser, initAuthState, subscribeToAuthState } from './services/authService.js';
 import { updateTexts } from '../js/i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
+
+function loadAuthService() {
+    return import('./services/authService.js');
+}
 
 function renderFavorites(list, containerId) {
     const container = document.getElementById(containerId);
@@ -64,6 +67,7 @@ function renderFavorites(list, containerId) {
 
         removeBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
+            const { getCurrentUser } = await loadAuthService();
 
             await removeFromFavorites(item.id, getCurrentUser());
 
@@ -87,10 +91,12 @@ function renderAllFavorites() {
     renderFavorites(favorites.filter(item => item.type === 'book'), 'fav-books');
 }
 
-initAuthState();
 renderAllFavorites();
-subscribeToAuthState(() => {
-    renderAllFavorites();
+void loadAuthService().then(({ initAuthState, subscribeToAuthState }) => {
+    initAuthState();
+    subscribeToAuthState(() => {
+        renderAllFavorites();
+    });
 });
 
 updateTexts();

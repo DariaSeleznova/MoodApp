@@ -8,9 +8,8 @@ import spirited from '../assets/icons/spirited.png';
 import tired from '../assets/icons/tired.png';
 import logo from '../assets/icons/logo.png';
 import { setLanguage } from '../js/i18n/i18n.js';
-import { initAuthModal, openAuthModal } from './ui/authModal.js';
-import { initAuthState } from './services/authService.js';
 import { initProfileMenu } from './ui/profileMenu.js';
+import { closeDropdown, openDropdown } from './ui/uiManager.js';
 
 const moodImages = {
     happy,
@@ -38,9 +37,18 @@ document.querySelectorAll('.mood-btn').forEach((btn) => {
 
 document.addEventListener('DOMContentLoaded', init);
 
+function loadAuthService() {
+    return import('./services/authService.js');
+}
+
+function loadAuthModal() {
+    return import('./ui/authModal.js');
+}
+
 function init() {
-    initAuthState();
-    initAuthModal();
+    void loadAuthService().then(({ initAuthState }) => {
+        initAuthState();
+    });
     initProfileMenu();
 
     const logoImg = document.querySelector('.logo img');
@@ -58,11 +66,10 @@ function init() {
     initLanguageSwitch(savedLang);
 
     document.querySelector('.login-btn')?.addEventListener('click', () => {
-        openAuthModal('login');
-    });
-
-    document.querySelector('.signup-btn')?.addEventListener('click', () => {
-        openAuthModal('signup');
+        void loadAuthModal().then(({ initAuthModal, openAuthModal }) => {
+            initAuthModal();
+            openAuthModal('login');
+        });
     });
 }
 
@@ -94,31 +101,21 @@ function initLanguageSwitch(initialLang) {
         });
     };
 
-    const closeDropdown = () => {
-        langSwitch.classList.remove('open');
-        trigger.setAttribute('aria-expanded', 'false');
-    };
-
-    const openDropdown = () => {
-        langSwitch.classList.add('open');
-        trigger.setAttribute('aria-expanded', 'true');
-    };
-
     updateSelectedLanguage(initialLang);
 
     trigger.addEventListener('click', () => {
         if (langSwitch.classList.contains('open')) {
-            closeDropdown();
+            closeDropdown(langSwitch, trigger);
             return;
         }
 
-        openDropdown();
+        openDropdown(langSwitch, trigger);
     });
 
     trigger.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            openDropdown();
+            openDropdown(langSwitch, trigger);
             options[0]?.focus();
         }
     });
@@ -133,26 +130,20 @@ function initLanguageSwitch(initialLang) {
 
             setLanguage(nextLang);
             updateSelectedLanguage(nextLang);
-            closeDropdown();
+            closeDropdown(langSwitch, trigger);
         });
 
         option.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
-                closeDropdown();
+                closeDropdown(langSwitch, trigger);
                 trigger.focus();
             }
         });
     });
 
-    document.addEventListener('click', (event) => {
-        if (!langSwitch.contains(event.target)) {
-            closeDropdown();
-        }
-    });
-
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && langSwitch.classList.contains('open')) {
-            closeDropdown();
+            closeDropdown(langSwitch, trigger);
             trigger.focus();
         }
     });

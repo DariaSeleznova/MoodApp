@@ -1,6 +1,30 @@
-import { toggleFavorite, isFavorite } from '../services/favoritesService';
-import { getCurrentUser, getIsAuthenticated, setPendingAuthAction } from '../services/authService.js';
-import { openAuthModal } from '../ui/authModal.js';
+import { isFavorite } from './favoritesStorage.js';
+
+function loadAuthService() {
+    return import('../services/authService.js');
+}
+
+function loadFavoritesService() {
+    return import('../services/favoritesService.js');
+}
+
+function loadAuthModal() {
+    return import('../ui/authModal.js');
+}
+
+async function applyFavoriteToggle(button, item) {
+    const wasActive = button.classList.contains('active');
+    button.classList.toggle('active');
+
+    try {
+        const { toggleFavorite } = await loadFavoritesService();
+        const { getCurrentUser } = await loadAuthService();
+        await toggleFavorite(item, getCurrentUser());
+    } catch (error) {
+        button.classList.toggle('active', wasActive);
+        window.alert('Could not save favorite. Please try again.');
+    }
+}
 
 export function setupFavoriteButton(button, item) {
 
@@ -11,16 +35,18 @@ export function setupFavoriteButton(button, item) {
     button.addEventListener('click', async (e) => {
         e.stopPropagation();
 
+        const { getIsAuthenticated, setPendingAuthAction } = await loadAuthService();
+
         if (!getIsAuthenticated()) {
-            setPendingAuthAction(() => {
-                toggleFavorite(item, getCurrentUser());
-                button.classList.toggle('active');
+            setPendingAuthAction(async () => {
+                await applyFavoriteToggle(button, item);
             });
+            const { initAuthModal, openAuthModal } = await loadAuthModal();
+            initAuthModal();
             openAuthModal('login');
             return;
         }
 
-        await toggleFavorite(item, getCurrentUser());
-        button.classList.toggle('active');
+        await applyFavoriteToggle(button, item);
     });
 }

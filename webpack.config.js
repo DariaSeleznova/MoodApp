@@ -60,7 +60,8 @@ module.exports = {
         new webpack.DefinePlugin({
             'process.env.TMDB_TOKEN': JSON.stringify(process.env.TMDB_TOKEN),
             'process.env.LASTFM_KEY': JSON.stringify(process.env.LASTFM_KEY),
-            'process.env.GOOGLE_KEY': JSON.stringify(process.env.GOOGLE_KEY)
+            'process.env.GOOGLE_KEY': JSON.stringify(process.env.GOOGLE_KEY),
+            'process.env.FIREBASE_KEY': JSON.stringify(process.env.FIREBASE_KEY)
         })
     ]
 };

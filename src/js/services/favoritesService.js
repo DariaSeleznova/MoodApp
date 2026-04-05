@@ -1,21 +1,42 @@
-import { ensureUserDocument, getUserFavorites, saveUserFavorites } from './userDataService.js';
+import { addUserFavorite, ensureUserDocument, getUserFavorites, removeUserFavorite } from './userDataService.js';
+import {
+    getFavoritesFromStorage,
+    isFavorite,
+    readFavorites,
+    writeFavoritesToStorage
+} from '../utils/favoritesStorage.js';
 
-const FAVORITES_STORAGE_KEY = 'favorites';
-
-function readFavorites() {
-    return JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY)) || [];
+function isFavoriteRecord(item) {
+    return Boolean(item) && typeof item === 'object' && 'id' in item;
 }
 
-function writeFavorites(favorites) {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
+export function writeFavorites(favorites) {
+    writeFavoritesToStorage(favorites);
+    updateFavoritesUI();
 }
 
-export function isFavorite(id) {
-    return readFavorites().some(item => item.id === id);
+export function updateFavoritesUI() {
+    const cardSelector = [
+        '.movie-card[data-id]',
+        '.series-card[data-id]',
+        '.music-card[data-id]',
+        '.book-card[data-id]',
+        '.list-card[data-id]'
+    ].join(', ');
+
+    document.querySelectorAll(cardSelector).forEach((card) => {
+        const favoriteButton = card.querySelector('.btn-fav');
+
+        if (!favoriteButton) {
+            return;
+        }
+
+        favoriteButton.classList.toggle('active', isFavorite(card.dataset.id));
+    });
 }
 
 export function getFavorites() {
-    return readFavorites();
+    return getFavoritesFromStorage();
 }
 
 export async function syncFavoritesForUser(user) {
@@ -25,14 +46,15 @@ export async function syncFavoritesForUser(user) {
     }
 
     await ensureUserDocument(user);
-    const favorites = await getUserFavorites(user.uid);
-    writeFavorites(favorites);
-    return favorites;
+    const syncedFavorites = (await getUserFavorites(user.uid)).filter(isFavoriteRecord);
+    writeFavorites(syncedFavorites);
+    return syncedFavorites;
 }
 
 export async function toggleFavorite(item, user = null) {
     const favorites = readFavorites();
-    const exists = favorites.some(fav => fav.id === item.id);
+    const existingFavorite = favorites.find(fav => fav.id === item.id);
+    const exists = Boolean(existingFavorite);
     const updated = exists
         ? favorites.filter(fav => fav.id !== item.id)
         : [...favorites, item];
@@ -40,8 +62,19 @@ export async function toggleFavorite(item, user = null) {
     writeFavorites(updated);
 
     if (user) {
-        await ensureUserDocument(user);
-        await saveUserFavorites(user.uid, updated);
+        try {
+            await ensureUserDocument(user);
+
+            if (exists) {
+                await removeUserFavorite(user.uid, existingFavorite);
+            } else {
+                await addUserFavorite(user.uid, item);
+            }
+        } catch (error) {
+            writeFavorites(favorites);
+            console.error('Failed to sync favorite with Firestore:', error);
+            throw error;
+        }
     }
 
     return updated;
@@ -49,13 +82,22 @@ export async function toggleFavorite(item, user = null) {
 
 export async function removeFromFavorites(id, user = null) {
     const favorites = readFavorites();
+    const existingFavorite = favorites.find(item => item.id === id);
     const updated = favorites.filter(item => item.id !== id);
 
     writeFavorites(updated);
 
     if (user) {
-        await ensureUserDocument(user);
-        await saveUserFavorites(user.uid, updated);
+        try {
+            await ensureUserDocument(user);
+            if (existingFavorite) {
+                await removeUserFavorite(user.uid, existingFavorite);
+            }
+        } catch (error) {
+            writeFavorites(favorites);
+            console.error('Failed to remove favorite from Firestore:', error);
+            throw error;
+        }
     }
 
     return updated;

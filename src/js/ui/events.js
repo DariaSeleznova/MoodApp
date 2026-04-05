@@ -59,6 +59,10 @@ export function resetAppState() {
     updateMoreLinks();
 }
 
+export function getCurrentMood() {
+    return currentMood;
+}
+
 function updateMoreLinks() {
     const links = document.querySelectorAll('.more-link');
 

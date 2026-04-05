@@ -1,4 +1,4 @@
-import { isFavorite } from '../services/favoritesService';
+import { isFavorite } from '../utils/favoritesStorage.js';
 import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
@@ -47,6 +47,7 @@ async function showMovie() {
     const trailerUrl = getTrailerUrl(details.videos?.results);
     const card = document.createElement('div');
     card.classList.add('movie-card', 'fade-in');
+    card.dataset.id = String(movie.id);
 
     card.innerHTML = `
   <div class="movie-card__image">
@@ -216,6 +217,7 @@ async function showSeries() {
 
     const card = document.createElement('div');
     card.classList.add('series-card');
+    card.dataset.id = String(show.id);
 
     card.innerHTML = `
     <div class="series-card__image">
@@ -351,6 +353,7 @@ export function renderMusic(tracks) {
 
         const card = document.createElement('div');
         card.classList.add('music-card', 'fade-in');
+        card.dataset.id = String(track.url);
 
         card.innerHTML = `
             <div class="music-card__image">
@@ -403,6 +406,7 @@ export function renderBooks(books) {
 
         const card = document.createElement('div');
         card.classList.add('book-card', 'fade-in');
+        card.dataset.id = String(book.id);
 
         card.innerHTML = `
             <div class="book-card__image">

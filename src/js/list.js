@@ -10,12 +10,10 @@ import {
 } from './services/movieService';
 import { getBooksByMood, getTrendingBooks } from './services/bookService';
 import { getMusicByMood, getTrendingMusic } from './services/musicService';
-import { isFavorite } from './services/favoritesService';
+import { isFavorite } from './utils/favoritesStorage.js';
 import { setupFavoriteButton } from './utils/favoriteHandler.js';
 import { updateTexts, translate } from './i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
-import { initAuthModal } from './ui/authModal.js';
-import { initAuthState } from './services/authService.js';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -24,8 +22,13 @@ const mood = params.get('mood') || null;
 const title = document.getElementById('page-title');
 const container = document.getElementById('list-container');
 
-initAuthState();
-initAuthModal();
+function loadAuthService() {
+    return import('./services/authService.js');
+}
+
+void loadAuthService().then(({ initAuthState }) => {
+    initAuthState();
+});
 
 async function loadList() {
     const listConfig = {
@@ -61,6 +64,10 @@ async function loadList() {
         return;
     }
 
+    title.textContent = mood
+        ? `${translate(mood)} ${translate(type)}`
+        : `${translate('trending')} ${translate(type)}`;
+
     let data;
 
     if (mood) {
@@ -75,10 +82,6 @@ async function loadList() {
 loadList();
 
 updateTexts();
-
-title.textContent = mood
-    ? `${translate(mood)} ${translate(type)}`
-    : `${translate('trending')} ${translate(type)}`;
 
 const backLogo = document.querySelector('.back-logo img');
 if (backLogo) backLogo.src = logo;
@@ -127,6 +130,7 @@ async function renderMoviesList(movies) {
     moviesWithTrailers.forEach(({ movie, trailerUrl }) => {
         const card = document.createElement('div');
         card.classList.add('list-card');
+        card.dataset.id = String(movie.id);
 
         const imageUrl = movie.poster_path
             ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
@@ -199,6 +203,7 @@ async function renderSeriesList(series) {
     seriesWithTrailers.forEach(({ show, trailerUrl }) => {
         const card = document.createElement('div');
         card.classList.add('list-card');
+        card.dataset.id = String(show.id);
 
         const imageUrl = show.poster_path
             ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
@@ -251,6 +256,7 @@ function renderMusicList(tracks) {
     tracks.forEach(track => {
         const card = document.createElement('div');
         card.classList.add('list-card');
+        card.dataset.id = String(track.url);
 
         const imageUrl = track.image;
 
@@ -295,6 +301,7 @@ function renderBooksList(books) {
 
         const card = document.createElement('div');
         card.classList.add('list-card');
+        card.dataset.id = String(book.id);
 
         card.innerHTML = `
             <div class="list-card__image">

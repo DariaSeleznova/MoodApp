@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase.js';
 
 function getUserDocRef(userId) {
@@ -42,12 +42,22 @@ export async function getUserFavorites(userId) {
     return userSnapshot.data().favorites || [];
 }
 
-export async function saveUserFavorites(userId, favorites) {
+export async function addUserFavorite(userId, favorite) {
     if (!userId) {
         return;
     }
 
     await updateDoc(getUserDocRef(userId), {
-        favorites
+        favorites: arrayUnion(favorite)
+    });
+}
+
+export async function removeUserFavorite(userId, favorite) {
+    if (!userId) {
+        return;
+    }
+
+    await updateDoc(getUserDocRef(userId), {
+        favorites: arrayRemove(favorite)
     });
 }

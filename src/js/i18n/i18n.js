@@ -34,6 +34,16 @@ export function updateTexts() {
         const key = el.dataset.i18n;
         el.textContent = translate(key);
     });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18nPlaceholder;
+        el.setAttribute('placeholder', translate(key));
+    });
+
+    document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        const key = el.dataset.i18nAriaLabel;
+        el.setAttribute('aria-label', translate(key));
+    });
 }
 
 export function getApiLanguage() {

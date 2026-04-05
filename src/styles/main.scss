@@ -645,9 +645,11 @@ header {
     position: relative;
 
     &__trigger {
-        width: 44px;
-        height: 44px;
-        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 0 12px 0 0;
         border: none;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.08);
@@ -655,6 +657,7 @@ header {
     }
 
     &__avatar {
+        flex-shrink: 0;
         width: 44px;
         height: 44px;
         border-radius: 999px;
@@ -671,6 +674,27 @@ header {
             height: 100%;
             object-fit: cover;
         }
+    }
+
+    &__avatar-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+
+        svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+    }
+
+    &__trigger-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: white;
+        white-space: nowrap;
     }
 
     &__dropdown {
@@ -704,6 +728,29 @@ header {
     &__email {
         font-size: 12px;
         opacity: 0.7;
+    }
+
+    &__greeting {
+        margin: 0 0 14px;
+        padding: 10px 12px 2px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    &__greeting-title,
+    &__greeting-text {
+        margin: 0;
+    }
+
+    &__greeting-title {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    &__greeting-text {
+        margin-top: 4px;
+        font-size: 12px;
+        opacity: 0.72;
     }
 
     &__link,

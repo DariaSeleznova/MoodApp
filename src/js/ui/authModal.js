@@ -1,22 +1,33 @@
-import {
-    initAuthState,
-    loginWithEmail,
-    loginWithGoogle,
-    runPendingAuthAction,
-    signupWithEmail
-} from '../services/authService.js';
 import { translate, updateTexts } from '../i18n/i18n.js';
+import { runPendingAuthAction } from '../services/authService.js';
+
 
 let modalElement = null;
 let initialized = false;
 const MODAL_CLOSE_DURATION_MS = 220;
 let closeTimeoutId = null;
 
+function loadAuthService() {
+    return import('../services/authService.js');
+}
+
 function getTabElements() {
     return {
         tabs: modalElement?.querySelectorAll('[data-auth-tab]') || [],
         panels: modalElement?.querySelectorAll('[data-auth-panel]') || []
     };
+}
+
+function setModalTitle(tab) {
+    const titleElement = modalElement?.querySelector('#auth-modal-title');
+
+    if (!titleElement) {
+        return;
+    }
+
+    const titleKey = tab === 'signup' ? 'signup' : 'login';
+    titleElement.dataset.i18n = titleKey;
+    titleElement.textContent = translate(titleKey);
 }
 
 function setActiveTab(tab) {
@@ -33,6 +44,8 @@ function setActiveTab(tab) {
     panels.forEach(panel => {
         panel.classList.toggle('active', panel.dataset.authPanel === tab);
     });
+
+    setModalTitle(tab);
 }
 
 export function openAuthModal(tab = 'login') {
@@ -40,6 +53,7 @@ export function openAuthModal(tab = 'login') {
         return;
     }
 
+    void loadAuthService();
     setActiveTab(tab);
     if (closeTimeoutId) {
         clearTimeout(closeTimeoutId);
@@ -79,8 +93,8 @@ function buildModal() {
     wrapper.innerHTML = `
         <div class="auth-modal__backdrop" data-auth-close></div>
         <div class="auth-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-            <button class="auth-modal__close" type="button" aria-label="${translate('close')}" data-auth-close>x</button>
-            <h2 id="auth-modal-title" data-i18n="auth.titlePrompt">To add items to favorites, please log in or sign up</h2>
+            <button class="auth-modal__close" type="button" data-auth-close data-i18n-aria-label="close">x</button>
+            <h2 id="auth-modal-title" data-i18n="login">Login</h2>
             <div class="auth-modal__tabs">
             
                 <button class="auth-modal__tab active" type="button" data-auth-tab="login" data-i18n="login">Login</button>
@@ -89,18 +103,17 @@ function buildModal() {
             <div class="auth-modal__panel active" data-auth-panel="login">
                 
                 <form class="auth-form" data-auth-form="login">
-                    <input class="auth-form__input" name="email" type="email" placeholder="${translate('emailPlaceholder')}" aria-label="${translate('emailPlaceholder')}" required>
-                    <input class="auth-form__input" name="password" type="password" placeholder="${translate('passwordPlaceholder')}" aria-label="${translate('passwordPlaceholder')}" required>
+                    <input class="auth-form__input" name="email" type="email" data-i18n-placeholder="emailPlaceholder" data-i18n-aria-label="emailPlaceholder" required>
+                    <input class="auth-form__input" name="password" type="password" data-i18n-placeholder="passwordPlaceholder" data-i18n-aria-label="passwordPlaceholder" required>
                     <button class="btn btn-primary auth-form__submit" type="submit" data-i18n="login">Login</button>
                 </form>
                 <button class="btn btn-secondary auth-form__google" type="button" data-auth-google data-i18n="continueWithGoogle">Continue with Google</button>
             </div>
             <div class="auth-modal__panel" data-auth-panel="signup">
-                <h2 id="auth-modal-title" data-i18n="auth.titlePrompt">To add items to favorites, please log in or sign up</h2>
                 <form class="auth-form" data-auth-form="signup">
-                    <input class="auth-form__input" name="name" type="text" placeholder="${translate('namePlaceholder')}" aria-label="${translate('namePlaceholder')}" required>
-                    <input class="auth-form__input" name="email" type="email" placeholder="${translate('emailPlaceholder')}" aria-label="${translate('emailPlaceholder')}" required>
-                    <input class="auth-form__input" name="password" type="password" placeholder="${translate('passwordPlaceholder')}" aria-label="${translate('passwordPlaceholder')}" required>
+                    <input class="auth-form__input" name="name" type="text" data-i18n-placeholder="namePlaceholder" data-i18n-aria-label="namePlaceholder" required>
+                    <input class="auth-form__input" name="email" type="email" data-i18n-placeholder="emailPlaceholder" data-i18n-aria-label="emailPlaceholder" required>
+                    <input class="auth-form__input" name="password" type="password" data-i18n-placeholder="passwordPlaceholder" data-i18n-aria-label="passwordPlaceholder" required>
                     <button class="btn btn-primary auth-form__submit" type="submit" data-i18n="createAccount">Create Account</button>
                 </form>
                 <button class="btn btn-secondary auth-form__google" type="button" data-auth-google data-i18n="continueWithGoogle">Continue with Google</button>
@@ -116,7 +129,6 @@ export function initAuthModal() {
         return;
     }
 
-    initAuthState();
     modalElement = buildModal();
     document.body.appendChild(modalElement);
     updateTexts();
@@ -143,21 +155,26 @@ export function initAuthModal() {
             event.preventDefault();
 
             const formData = new FormData(form);
+            const name = formData.get('name');
             const email = formData.get('email');
             const password = formData.get('password');
 
             try {
+                const { loginWithEmail, signupWithEmail } = await loadAuthService();
+
                 if (form.dataset.authForm === 'signup') {
-                    await signupWithEmail(email, password);
+                    await signupWithEmail(name, email, password);
                 } else {
                     await loginWithEmail(email, password);
                 }
 
                 closeAuthModal();
-                runPendingAuthAction();
+
                 form.reset();
             } catch (error) {
                 window.alert(error.message);
+            } finally {
+                await runPendingAuthAction();
             }
         });
     });
@@ -173,6 +190,7 @@ export function initAuthModal() {
 
 async function handleGoogleLogin() {
     try {
+        const { loginWithGoogle, runPendingAuthAction } = await loadAuthService();
         await loginWithGoogle();
         closeAuthModal();
         runPendingAuthAction();
