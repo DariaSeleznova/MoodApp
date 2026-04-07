@@ -947,6 +947,42 @@ header {
         width: 100%;
     }
 
+    &__forgot {
+        align-self: flex-start;
+        margin-top: -2px;
+        padding: 0;
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.72);
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        transition: color 0.2s ease, opacity 0.2s ease;
+
+        &:hover,
+        &:focus-visible {
+            color: white;
+            opacity: 1;
+            outline: none;
+        }
+    }
+
+    &__message {
+        min-height: 18px;
+        margin: -4px 0 0;
+        font-size: 12px;
+        line-height: 1.4;
+        color: rgba(255, 255, 255, 0.72);
+
+        &[data-state='success'] {
+            color: #7be495;
+        }
+
+        &[data-state='error'] {
+            color: #ff8f8f;
+        }
+    }
+
     &__google {
         margin-top: 12px;
         width: 100%;

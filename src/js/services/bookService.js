@@ -40,5 +40,6 @@ export async function getTrendingBooks(limit = 30) {
     }
 
     const data = await res.json();
+
     return data.items || [];
 }

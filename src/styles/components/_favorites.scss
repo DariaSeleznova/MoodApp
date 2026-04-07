@@ -1,3 +1,36 @@
+.fan-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+
+    .back-logo {
+        position: relative;
+
+        img {
+            width: 250px;
+        }
+    }
+
+}
+
+.favorite_lists {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    .left-column {
+        grid-column: 1;
+    }
+
+    .right-column {
+        grid-column: 2;
+    }
+
+
+
+}
+
 .fav-card {
     display: flex;
     gap: 12px;

@@ -1,6 +1,7 @@
 import {
     createUserWithEmailAndPassword,
     onAuthStateChanged,
+    sendPasswordResetEmail,
     signInWithEmailAndPassword,
     signInWithPopup,
     signOut,
@@ -74,12 +75,16 @@ export async function loginWithGoogle() {
     return result.user;
 }
 
+export async function requestPasswordReset(email) {
+    await sendPasswordResetEmail(auth, email);
+}
+
 export async function logout() {
     await signOut(auth);
     currentUser = null;
     pendingAuthAction = null;
     writeFavorites([]);
-    // window.dispatchEvent(new Event('favoritesUpdated'));
+
 
 }
 

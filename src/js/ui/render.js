@@ -2,8 +2,9 @@ import { isFavorite } from '../utils/favoritesStorage.js';
 import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
+import { subscribe } from 'firebase/data-connect';
 
-const AUTOPLAY_DELAY = 30000;
+const AUTOPLAY_DELAY = 10000;
 
 let currentIndex = 0;
 let moviesData = [];
@@ -92,6 +93,7 @@ async function showMovie() {
     setupFavoriteButton(favBtn, {
         id: movie.id,
         title: movie.title,
+        subtitle: movie.overview,
         image: movie.poster_path,
         type: 'movie',
         rating: movie.vote_average,
@@ -255,9 +257,10 @@ async function showSeries() {
 
     setupTrailerButton(trailerBtn, trailerUrl);
 
-    setupFavoriteButton(favBtn, {
+    setupFavoriteButton(favBtn, {//берем данные для объекта
         id: show.id,
         title: show.name,
+        subtitle: show.overview,
         image: show.poster_path,
         type: 'series',
         rating: show.vote_average,
@@ -381,6 +384,7 @@ export function renderMusic(tracks) {
         setupFavoriteButton(favBtn, {
             id: track.url,
             title: track.name,
+            subtitle: track.artist.name,
             image: track.image,
             type: 'music',
             link: track.url
@@ -398,7 +402,6 @@ export function renderBooks(books) {
 
     books.forEach(book => {
         const info = book.volumeInfo;
-
         const title = info.title;
         const authors = info.authors?.join(', ') || translate('unknownAuthor');
         const link = info.previewLink;
@@ -433,6 +436,7 @@ export function renderBooks(books) {
         setupFavoriteButton(favBtn, {
             id: book.id,
             title: info.title,
+            subtitle: info.authors?.join(', ') || translate('unknownAuthor'),
             image: info.imageLinks?.thumbnail,
             type: 'book',
             link: info.previewLink

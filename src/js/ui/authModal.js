@@ -1,6 +1,4 @@
 import { translate, updateTexts } from '../i18n/i18n.js';
-import { runPendingAuthAction } from '../services/authService.js';
-
 
 let modalElement = null;
 let initialized = false;
@@ -9,6 +7,21 @@ let closeTimeoutId = null;
 
 function loadAuthService() {
     return import('../services/authService.js');
+}
+
+function setFormMessage(form, message, type = '') {
+    const messageElement = form?.querySelector('[data-auth-message]');
+
+    if (!messageElement) {
+        return;
+    }
+
+    messageElement.textContent = message || '';
+    messageElement.dataset.state = type;
+}
+
+function clearFormMessage(form) {
+    setFormMessage(form, '');
 }
 
 function getTabElements() {
@@ -105,6 +118,8 @@ function buildModal() {
                 <form class="auth-form" data-auth-form="login">
                     <input class="auth-form__input" name="email" type="email" data-i18n-placeholder="emailPlaceholder" data-i18n-aria-label="emailPlaceholder" required>
                     <input class="auth-form__input" name="password" type="password" data-i18n-placeholder="passwordPlaceholder" data-i18n-aria-label="passwordPlaceholder" required>
+                    <button class="auth-form__forgot" type="button" data-auth-reset-password data-i18n="auth.forgotPassword">Forgot password?</button>
+                    <p class="auth-form__message" data-auth-message aria-live="polite"></p>
                     <button class="btn btn-primary auth-form__submit" type="submit" data-i18n="login">Login</button>
                 </form>
                 <button class="btn btn-secondary auth-form__google" type="button" data-auth-google data-i18n="continueWithGoogle">Continue with Google</button>
@@ -145,6 +160,11 @@ export function initAuthModal() {
             return;
         }
 
+        if (event.target.closest('[data-auth-reset-password]')) {
+            handlePasswordReset(event.target.closest('[data-auth-form]'));
+            return;
+        }
+
         if (event.target.closest('[data-auth-google]')) {
             handleGoogleLogin();
         }
@@ -153,6 +173,7 @@ export function initAuthModal() {
     modalElement.querySelectorAll('[data-auth-form]').forEach(form => {
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
+            clearFormMessage(form);
 
             const formData = new FormData(form);
             const name = formData.get('name');
@@ -160,7 +181,7 @@ export function initAuthModal() {
             const password = formData.get('password');
 
             try {
-                const { loginWithEmail, signupWithEmail } = await loadAuthService();
+                const { loginWithEmail, signupWithEmail, runPendingAuthAction } = await loadAuthService();
 
                 if (form.dataset.authForm === 'signup') {
                     await signupWithEmail(name, email, password);
@@ -171,10 +192,9 @@ export function initAuthModal() {
                 closeAuthModal();
 
                 form.reset();
-            } catch (error) {
-                window.alert(error.message);
-            } finally {
                 await runPendingAuthAction();
+            } catch (error) {
+                setFormMessage(form, error.message, 'error');
             }
         });
     });
@@ -188,12 +208,45 @@ export function initAuthModal() {
     initialized = true;
 }
 
+async function handlePasswordReset(form) {
+    const emailInput = form?.querySelector('input[name="email"]');
+
+    if (!emailInput) {
+        return;
+    }
+
+    clearFormMessage(form);
+
+    const email = emailInput.value.trim();
+    emailInput.value = email;
+
+    if (!email) {
+        setFormMessage(form, translate('auth.resetEmailRequired'), 'error');
+        emailInput.focus();
+        return;
+    }
+
+    if (!emailInput.checkValidity()) {
+        setFormMessage(form, translate('auth.resetEmailInvalid'), 'error');
+        emailInput.reportValidity();
+        return;
+    }
+
+    try {
+        const { requestPasswordReset } = await loadAuthService();
+        await requestPasswordReset(email);
+        setFormMessage(form, translate('auth.resetEmailSent'), 'success');
+    } catch (error) {
+        setFormMessage(form, error.message, 'error');
+    }
+}
+
 async function handleGoogleLogin() {
     try {
         const { loginWithGoogle, runPendingAuthAction } = await loadAuthService();
         await loginWithGoogle();
         closeAuthModal();
-        runPendingAuthAction();
+        await runPendingAuthAction();
     } catch (error) {
         window.alert(error.message);
     }

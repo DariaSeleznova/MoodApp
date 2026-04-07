@@ -59,6 +59,5 @@ export async function getTrendingMusic(limit) {
 
     const data = await res.json();
     const tracks = data.tracks.track.slice(0, limit);
-
     return enrichTracksWithDetails(tracks);
 }

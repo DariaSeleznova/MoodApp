@@ -48,21 +48,29 @@ function renderFavorites(list, containerId) {
                 ? item.image
                 : `https://image.tmdb.org/t/p/w200${item.image}` // TMDB
             : null;
+        const title = item.title;
+        const subtitle = item.subtitle;
+
         card.innerHTML = `
-            <div class="fav-card__image">
-                ${imageUrl
+    <div class="fav-card__image">
+        ${imageUrl
                 ? `<img src="${imageUrl}" />`
                 : `<div class="fav-card__placeholder">⭐</div>`
             }
-            </div>
+    </div>
 
-            <div class="fav-card__actions">
-               ${item.link ? `
-                <a href="${item.link}" target="_blank" class="movie-card__action" data-i18n="trailer"> ▶ Trailer </a>` : ''}
+    <div class="fav-card__info">
+        <h3 class="fav-card__title">${title}</h3>
+        <p class="fav-card__subtitle">${subtitle}</p>
 
-                <button class="fav-btn remove-btn">❌</button>
-            </div>
-        `;
+        <div class="fav-card__actions">
+           ${item.link ? `
+            <a href="${item.link}" target="_blank" class="movie-card__action" data-i18n="trailer"> ▶ Trailer </a>` : ''}
+
+            <button class="fav-btn remove-btn">❌</button>
+        </div>
+    </div>
+`;
         const removeBtn = card.querySelector('.remove-btn');
 
         removeBtn.addEventListener('click', async (e) => {
@@ -81,6 +89,7 @@ function renderFavorites(list, containerId) {
         container.appendChild(card);
     });
 }
+
 
 function renderAllFavorites() {
     const favorites = getFavorites();

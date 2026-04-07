@@ -71,7 +71,6 @@ export async function getSeriesByMood(mood, limit = 20) {
     };
 
     const genreId = genreMap[mood] || 35;
-    console.log('Series Mood:', mood, 'Genre ID:', genreId);
 
     const url = `${BASE_URL}/discover/tv?api_key=${process.env.TMDB_TOKEN}&with_genres=${genreId}&language=${language}`;
 

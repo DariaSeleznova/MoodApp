@@ -13,19 +13,33 @@
 </head>
 
 <body>
-    <a href="index.html" class="back-logo"><img src="./assets/icons/logo.png" alt="Back to home"></a>
-    <h1 data-i18n="favorites">❤️ Favorites</h1>
-    <h2 data-i18n="movies">🎬 Movies</h2>
-    <div id="fav-movies"></div>
+    <header class="fan-header">
+        <a href="index.html" class="back-logo "><img src="./assets/icons/logo.png" alt="Back to home"></a>
+        <h1 data-i18n="favorites" class="gradient-text">❤️ Favorites</h1>
+    </header>
+    <section class="favorite_lists">
+        <div class="left-column">
+            <div class="fav-conteiner-movie">
+                <h2 data-i18n="movies" class="gradient-text">🎬 Movies</h2>
+                <div id="fav-movies"></div>
+            </div>
+            <div class="fav-conteiner-music">
+                <h2 data-i18n="music" class="gradient-text">🎵 Music</h2>
+                <div id="fav-music"></div>
+            </div>
+        </div>
+        <div class="right-column">
+            <div class="fav-conteiner-series">
+                <h2 data-i18n="series" class="gradient-text">📺 Series</h2>
+                <div id="fav-series"></div>
+            </div>
+            <div class="fav-conteiner-books">
+                <h2 data-i18n="books" class="gradient-text">📚 Books</h2>
+                <div id="fav-books"></div>
+            </div>
+        </div>
+    </section>
 
-    <h2 data-i18n="series">📺 Series</h2>
-    <div id="fav-series"></div>
-
-    <h2 data-i18n="music">🎵 Music</h2>
-    <div id="fav-music"></div>
-
-    <h2 data-i18n="books">📚 Books</h2>
-    <div id="fav-books"></div>
 
 
 </body>
