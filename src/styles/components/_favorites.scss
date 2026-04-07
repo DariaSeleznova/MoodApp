@@ -1,23 +1,72 @@
+@use "sass:map";
+$breakpoints: (
+    sm: 426px,
+    md: 768px,
+    lg: 1023px,
+    xl: 1440px,
+    xxl: 1920px,
+);
+
+@mixin respond-max($size) {
+    @media (max-width: map.get($breakpoints, $size)) {
+        @content;
+    }
+}
+
 .fan-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: baseline;
 
+    @include respond-max(lg) {
+        align-items: stretch;
+    }
+
     .back-logo {
         position: relative;
 
         img {
             width: 250px;
+
+            @include respond-max(lg) {
+                width: 150px;
+            }
         }
     }
 
+    h1 {
+        font-size: 50px;
+
+        @include respond-max(lg) {
+            font-size: 30px;
+        }
+    }
 }
 
 .favorite_lists {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
+
+    @include respond-max(lg) {
+        display: flex;
+        flex-direction: column;
+    }
+
+    h2 {
+        font-size: 40px;
+
+        @include respond-max(lg) {
+            font-size: 20px;
+        }
+
+        @include respond-max(sm) {
+            margin: 30px auto 0;
+            text-align: center;
+            font-size: 30px;
+        }
+    }
 
     .left-column {
         grid-column: 1;
@@ -26,9 +75,24 @@
     .right-column {
         grid-column: 2;
     }
+}
 
+#fav-movies,
+#fav-music,
+#fav-series,
+#fav-books {
 
+    // Risky: this changes mobile card flow and alignment for all favorites lists.
+    @include respond-max(lg) {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
 
+    @include respond-max(sm) {
+        align-items: center;
+        position: relative;
+    }
 }
 
 .fav-card {
@@ -42,53 +106,84 @@
     padding: 10px;
     border-radius: 10px;
     margin-bottom: 10px;
-
+    position: relative;
     transition: transform 0.2s ease;
-}
 
-.fav-card:hover {
-    transform: scale(1.01);
-}
+    @include respond-max(lg) {
+        width: 100%;
+    }
 
-.fav-card__image img {
-    width: 60px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 6px;
-}
+    @include respond-max(sm) {
+        flex-direction: column;
+    }
 
-.fav-card__placeholder {
-    width: 60px;
-    height: 90px;
-    background: #333;
-    border-radius: 6px;
+    &:hover {
+        transform: scale(1.01);
+    }
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    // Risky: controls subtitle visibility logic (hidden on sm, shown for active card).
+    &.active .fav-card__subtitle {
+        display: block;
+    }
 
-.fav-card__info {
-    display: flex;
-    flex-direction: column;
-}
+    &__subtitle {
+        @include respond-max(lg) {
+            font-size: 14px;
+        }
 
-.fav-card__title {
-    font-weight: bold;
-}
+        @include respond-max(sm) {
+            display: none;
+        }
+    }
 
-.fav-card__rating {
-    font-size: 12px;
-    opacity: 0.7;
-}
+    &__image img {
+        width: 140px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
 
-.fav-card__actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 6px;
+    &__placeholder {
+        width: 60px;
+        height: 90px;
+        background: #333;
+        border-radius: 6px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__info {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+
+        @include respond-max(sm) {
+            align-items: center;
+        }
+    }
+
+    &__title {
+        font-weight: bold;
+    }
+
+    &__rating {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 6px;
+    }
 }
 
 .fav-btn {
+    right: 0;
+    top: 0;
+    position: absolute;
     background: #333;
     border: none;
     color: white;
@@ -99,33 +194,72 @@
     text-decoration: none;
 
     transition: background 0.2s ease;
-}
 
-.fav-btn:hover {
-    background: #444;
+    &:hover {
+        background: #444;
+    }
 }
 
 .remove-btn {
+    margin: 20px;
     background: transparent;
+
+    &:hover {
+        color: #e50914;
+    }
 }
 
-.remove-btn:hover {
-    color: #e50914;
+.fav-trailer {
+    border-radius: 12px;
+    border: none;
+    color: white;
+    text-decoration: none;
+    padding: 10px 55px;
 }
 
 .empty-state {
     text-align: center;
     padding: 20px;
     color: #aaa;
+
+    a {
+        display: inline-block;
+        margin-top: 8px;
+        color: #4dabf7;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
 
-.empty-state a {
-    display: inline-block;
-    margin-top: 8px;
-    color: #4dabf7;
+.music-card__btn,
+.btn-preview {
     text-decoration: none;
+    font-size: 20px;
 }
 
-.empty-state a:hover {
-    text-decoration: underline;
+.music-card__btn {
+    color: #00bcd4;
+}
+
+.btn-preview {
+    color: #ffc107;
+}
+
+//Доделать стили для кнопки "Подробнее" на мобильных устройствах, чтобы она не перекрывала другие элементы и была легко доступна для клика.
+.fav-more-btn {
+    color: #03a9f4;
+    background-color: transparent;
+    border: none;
+    font-family: "Balsamiq Sans", sans-serif;
+    font-size: 20px;
+
+    // Risky: absolute positioning on small screens affects button overlap/click area.
+    @include respond-max(sm) {
+        position: absolute;
+        bottom: -20px;
+        right: 10px;
+    }
 }

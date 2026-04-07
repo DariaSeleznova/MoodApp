@@ -2,7 +2,7 @@ import { isFavorite } from '../utils/favoritesStorage.js';
 import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
-import { subscribe } from 'firebase/data-connect';
+import { renderFavoriteButton, renderImage, renderTrailerButton } from '../utils/renderHelper.js';
 
 const AUTOPLAY_DELAY = 10000;
 
@@ -36,7 +36,20 @@ async function showMovie() {
 
     const movie = moviesData[currentIndex];
 
-    const details = await getMovieDetails(movie.id);
+    let details;
+
+    try {
+        details = await getMovieDetails(movie.id);
+    } catch (error) {
+        console.warn('Failed to load movie details', error);
+
+        // fallback (запасные данные)
+        details = {
+            overview: 'No description available',
+            runtime: null,
+            genres: []
+        };
+    }
 
     const imageUrl = movie.poster_path
         ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
@@ -51,9 +64,7 @@ async function showMovie() {
     card.dataset.id = String(movie.id);
 
     card.innerHTML = `
-  <div class="movie-card__image">
-    ${imageUrl ? `<img src="${imageUrl}" alt="${movie.title}" />` : ''}
-  </div>
+  ${renderImage(imageUrl, movie.title, '🎬')}
 
   <div class="movie-card__info">
     <h2 class="movie-card__title">${movie.title}</h2>
@@ -74,14 +85,8 @@ async function showMovie() {
     <p class="movie-card__meta">
     <span data-i18n="release"></span>: 📅 ${movie.release_date || '—'}
     </p>
-    <div class="movie-card__actions">
-      <button class="btn btn-primary btn-trailer" data-i18n="trailer"></button>
-    </div>
-   <button class="btn-fav ${isFavorite(movie.id) ? 'active' : ''}">
-  <svg class="heart" viewBox="0 0 32 32">
-    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z" />
-  </svg>
-</button>
+    ${renderTrailerButton(trailerUrl)}
+    ${renderFavoriteButton(movie.id)}
   </div>
 `;
 
@@ -205,14 +210,26 @@ async function showSeries() {
 
     const show = seriesData[currentSeriesIndex];
 
-    const details = await getSeriesDetails(show.id);
+    let details;
+
+    try {
+        details = await getSeriesDetails(show.id);
+    } catch (error) {
+        console.warn('Failed to load series details', error);
+
+        // fallback (запасные данные)
+        details = {
+            overview: 'No description available',
+            runtime: null,
+            genres: []
+        };
+    }
 
     const actors = details.aggregate_credits?.cast?.slice(0, 3).map(a => a.name).join(', ');
     const creator = details.created_by?.[0]?.name;
     const years = details.first_air_date?.split('-')[0];
     const seasons = details.number_of_seasons;
     const trailerUrl = getTrailerUrl(details.videos?.results);
-
     const imageUrl = show.poster_path
         ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
         : '';
@@ -222,9 +239,7 @@ async function showSeries() {
     card.dataset.id = String(show.id);
 
     card.innerHTML = `
-    <div class="series-card__image">
-    ${imageUrl ? `<img src="${imageUrl}" alt="${show.name}" />` : ''}
-  </div> 
+    ${renderImage(imageUrl, show.name, '📺')}
   <div class="series-card__info">
     <h2>${show.name}</h2>
     
@@ -242,14 +257,8 @@ async function showSeries() {
     <p class = serials-card_meta>
     ${seasons} <span data-i18n="seasonsLabel"></span>
     </p>
-    <div class="series-card__actions">
-      <button class="btn btn-primary btn-trailer" data-i18n="trailer"></button>
-    </div>
-    <button class="btn-fav ${isFavorite(show.id) ? 'active' : ''}">
-  <svg class="heart" viewBox="0 0 32 32">
-    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
-  </svg>
-</button>
+    ${renderTrailerButton(trailerUrl)}
+    ${renderFavoriteButton(show.id)}
   </div>
 `;
     const favBtn = card.querySelector('.btn-fav');
@@ -359,24 +368,15 @@ export function renderMusic(tracks) {
         card.dataset.id = String(track.url);
 
         card.innerHTML = `
-            <div class="music-card__image">
-                ${imageUrl
-                ? `<img src="${imageUrl}" alt="${track.name}" />`
-                : `<div class="music-card__placeholder">🎵</div>`
-            }
-            </div>
+                ${renderImage(imageUrl, track.name, '🎵')}
 
             <div class="music-card__info">
                 <p class="music-card__title">${track.name}</p>
                 <p class="music-card__artist">${track.artist.name}</p>
 
-                <a href="${track.url}" target="_blank" class="music-card__btn" data-i18n="listen">
+                <a href="${track.url}" target="_blank" class="music-card__btn" data-i18n="listen">🎵
                 </a>
-                <button class="btn-fav ${isFavorite(track.url) ? 'active' : ''}">
-  <svg class="heart" viewBox="0 0 32 32">
-    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
-  </svg>
-</button>
+                ${renderFavoriteButton(track.url)}
             </div>
         `;
         const favBtn = card.querySelector('.btn-fav');
@@ -387,7 +387,7 @@ export function renderMusic(tracks) {
             subtitle: track.artist.name,
             image: track.image,
             type: 'music',
-            link: track.url
+            listenLink: track.url
         });
 
         container.appendChild(card);
@@ -412,12 +412,7 @@ export function renderBooks(books) {
         card.dataset.id = String(book.id);
 
         card.innerHTML = `
-            <div class="book-card__image">
-                ${image
-                ? `<img src="${image}" alt="${title}" />`
-                : `<div class="book-card__placeholder">📚</div>`
-            }
-            </div>
+            ${renderImage(image, title, '📚')}
 
             <div class="book-card__info">
                 <p class="book-card__title">${title}</p>
@@ -425,11 +420,7 @@ export function renderBooks(books) {
 
                 <a href="${link}" target="_blank" class="book-card__btn" data-i18n="preview">
                 </a>
-                <button class="btn-fav ${isFavorite(book.id) ? 'active' : ''}">
-  <svg class="heart" viewBox="0 0 32 32">
-    <path d="M16,28.261c-0.757,0-1.515-0.289-2.094-0.868C9.575,23.111,1,17.159,1,11.205c0-4.048,3.284-7.332,7.332-7.332 c2.316,0,4.484,1.085,5.889,2.894l1.779,2.264l1.779-2.264c1.405-1.809,3.573-2.894,5.889-2.894C27.716,3.873,31,7.157,31,11.205 c0,5.954-8.575,11.906-12.906,16.188C17.515,27.972,16.757,28.261,16,28.261z"/>
-  </svg>
-</button>
+                ${renderFavoriteButton(book.id)}
             </div>
         `;
         const favBtn = card.querySelector('.btn-fav');
@@ -439,7 +430,7 @@ export function renderBooks(books) {
             subtitle: info.authors?.join(', ') || translate('unknownAuthor'),
             image: info.imageLinks?.thumbnail,
             type: 'book',
-            link: info.previewLink
+            previewLink: info.previewLink
         });
 
         container.appendChild(card);

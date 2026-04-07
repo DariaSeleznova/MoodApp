@@ -53,10 +53,10 @@ export async function syncFavoritesForUser(user) {
 
 export async function toggleFavorite(item, user = null) {
     const favorites = readFavorites();
-    const existingFavorite = favorites.find(fav => fav.id === item.id);
+    const existingFavorite = favorites.find(fav => String(fav.id) === String(item.id));
     const exists = Boolean(existingFavorite);
     const updated = exists
-        ? favorites.filter(fav => fav.id !== item.id)
+        ? favorites.filter(fav => String(fav.id) !== String(item.id))
         : [...favorites, item];
 
     writeFavorites(updated);
@@ -82,8 +82,8 @@ export async function toggleFavorite(item, user = null) {
 
 export async function removeFromFavorites(id, user = null) {
     const favorites = readFavorites();
-    const existingFavorite = favorites.find(item => item.id === id);
-    const updated = favorites.filter(item => item.id !== id);
+    const existingFavorite = favorites.find(item => String(item.id) === String(id));
+    const updated = favorites.filter(item => String(item.id) !== String(id));
 
     writeFavorites(updated);
 
