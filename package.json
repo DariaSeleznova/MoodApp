@@ -5,7 +5,8 @@
   "scripts": {
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
-    "dev": "dotenv webpack --mode development"
+    "dev": "dotenv webpack --mode development",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
   "devDependencies": {
     "css-loader": "^7.1.4",
     "dotenv-webpack": "^9.0.0",
+    "gh-pages": "^6.3.0",
     "html-webpack-plugin": "^5.6.6",
     "sass": "^1.98.0",
     "sass-loader": "^16.0.7",
