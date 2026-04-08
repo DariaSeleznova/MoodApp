@@ -64,12 +64,66 @@ function init() {
     const savedLang = localStorage.getItem('lang') || 'en';
     setLanguage(savedLang);
     initLanguageSwitch(savedLang);
+    initMoodPanel();
 
     document.querySelector('.login-btn')?.addEventListener('click', () => {
         void loadAuthModal().then(({ initAuthModal, openAuthModal }) => {
             initAuthModal();
             openAuthModal('login');
         });
+    });
+}
+
+function initMoodPanel() {
+    const toggleButton = document.querySelector('[data-mood-toggle]');
+    const backdrop = document.querySelector('[data-mood-backdrop]');
+    const moodNav = document.querySelector('.mood-nav');
+
+    if (!toggleButton || !backdrop || !moodNav) {
+        return;
+    }
+
+    const mobileMedia = window.matchMedia('(max-width: 426px)');
+
+    const closePanel = () => {
+        document.body.classList.remove('mood-panel-open');
+        toggleButton.setAttribute('aria-expanded', 'false');
+    };
+
+    const openPanel = () => {
+        document.body.classList.add('mood-panel-open');
+        toggleButton.setAttribute('aria-expanded', 'true');
+    };
+
+    toggleButton.addEventListener('click', () => {
+        if (document.body.classList.contains('mood-panel-open')) {
+            closePanel();
+            return;
+        }
+
+        openPanel();
+    });
+
+    backdrop.addEventListener('click', closePanel);
+
+    moodNav.querySelectorAll('.mood-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            if (mobileMedia.matches) {
+                closePanel();
+            }
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && document.body.classList.contains('mood-panel-open')) {
+            closePanel();
+        }
+    });
+
+    mobileMedia.addEventListener('change', (event) => {
+        if (!event.matches) {
+            closePanel();
+        }
     });
 }
 

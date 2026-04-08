@@ -1,3 +1,6 @@
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
+
 #list-container {
     display: flex;
     flex-direction: row;
@@ -6,68 +9,92 @@
 }
 
 .list-card {
-    display: flex;
+    @include m.favorites-card-shell;
     width: 47%;
-    gap: 16px;
     margin-bottom: 16px;
-    position: relative;
-    background: #1c1c1c;
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
-}
 
-.list-card__image img {
-    width: 220px;
-    border-radius: 8px;
-}
+    @include m.respond-max(lg) {
+        width: 100%;
+    }
 
-.list-card__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    @include m.respond-max(sm) {
+        flex-direction: column;
+    }
 
-    h3 {
-        margin: 0;
+    &.active .list-card__description {
+        display: block;
+    }
+
+    &__image img {
+        @include m.favorites-card-media;
+
+        @include m.respond-max(sm) {
+            width: 120px;
+            height: 170px;
+        }
+    }
+
+    &__info {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        @include m.respond-max(sm) {
+            width: 100%;
+            align-items: center;
+        }
+
+        h3 {
+            margin: 0;
+        }
+    }
+
+    &__description {
+        @include m.respond-max(lg) {
+            font-size: 14px;
+        }
+
+        @include m.respond-max(sm) {
+            display: none;
+            font-size: 12px;
+            text-align: center;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .btn-trailer {
+        min-height: 38px;
     }
 }
 
-.list-card__actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 12px;
-
-
-}
-
-.list-card .btn-trailer {
-    min-height: 38px;
-}
-
-// Scroll to top button
 .scroll-to-top {
+    @include m.flex-center;
     position: fixed;
     bottom: 20px;
     right: 20px;
     width: 50px;
     height: 50px;
-    background: #1db954;
+    background: v.$color-accent-green;
     border: none;
     border-radius: 50%;
-    color: white;
+    color: v.$color-text-primary;
     cursor: pointer;
     display: none;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: v.$shadow-sm;
     transition: all 0.3s ease;
     z-index: 1000;
 
     &:hover {
-        background: #1ed760;
+        background: v.$color-accent-green-hover;
         transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        box-shadow: v.$shadow-hover-sm;
     }
 
     svg {

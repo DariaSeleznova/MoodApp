@@ -12,6 +12,8 @@ const moodButtons = document.querySelectorAll('.mood-btn');
 document.addEventListener('DOMContentLoaded', () => {
     loadTrendingContent();
     updateMoreLinks();
+    setupSwipeNavigation('movies-list', prevMovie, nextMovie);
+    setupSwipeNavigation('series-list', prevSeries, nextSeries);
 });
 
 moodButtons.forEach((btn) => {
@@ -100,5 +102,56 @@ export function showMusicLoading() {
 }
 export function hideMusicLoading() {
     document.querySelector('.music-loader')?.classList.add('hidden');
+}
+
+function setupSwipeNavigation(containerId, onSwipeRight, onSwipeLeft) {
+    const container = document.getElementById(containerId);
+
+    if (!container) {
+        return;
+    }
+
+    const mobileMedia = window.matchMedia('(max-width: 426px)');
+    let startX = 0;
+    let startY = 0;
+    let isTracking = false;
+
+    container.addEventListener('touchstart', (event) => {
+        if (!mobileMedia.matches || event.touches.length !== 1) {
+            return;
+        }
+
+        startX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        isTracking = true;
+    }, { passive: true });
+
+    container.addEventListener('touchend', (event) => {
+        if (!isTracking || !mobileMedia.matches || event.changedTouches.length !== 1) {
+            return;
+        }
+
+        const endX = event.changedTouches[0].clientX;
+        const endY = event.changedTouches[0].clientY;
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+
+        isTracking = false;
+
+        if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+            return;
+        }
+
+        if (deltaX > 0) {
+            onSwipeRight();
+            return;
+        }
+
+        onSwipeLeft();
+    }, { passive: true });
+
+    container.addEventListener('touchcancel', () => {
+        isTracking = false;
+    }, { passive: true });
 }
 

@@ -1,0 +1,74 @@
+$breakpoints: (
+    sm: 426px,
+    md: 768px,
+    lg: 1025px,
+    xl: 1440px
+);
+
+$font-family-base: 'Balsamiq Sans', sans-serif;
+
+$color-bg-page: #111;
+$color-surface: #1c1c1c;
+$color-surface-hover: #2a2a2a;
+$color-surface-muted: #333;
+$color-surface-muted-hover: #444;
+$color-surface-elevated: #1b1b1f;
+$color-black: #000;
+
+$color-text-primary: #fff;
+$color-text-muted: rgba(255, 255, 255, 0.72);
+$color-text-soft: #f5f5f5;
+
+$color-border-soft: rgba(255, 255, 255, 0.08);
+$color-border-medium: rgba(255, 255, 255, 0.12);
+$color-border-strong: rgba(255, 255, 255, 0.18);
+
+$color-overlay-soft: rgba(10, 10, 14, 0.5);
+$color-overlay-strong: rgba(8, 10, 18, 0.7);
+$color-overlay-label: rgba(0, 0, 0, 0.8);
+$color-panel: rgba(25, 25, 30, 0.98);
+
+$color-loader-track: #ccc;
+
+$color-accent-red: #e50914;
+$color-accent-blue: #4dabf7;
+$color-accent-cyan: #03a9f4;
+$color-accent-teal: #00bcd4;
+$color-accent-green: #1db954;
+$color-accent-green-hover: #1ed760;
+$color-accent-yellow: #ffc107;
+$color-accent-success: #7be495;
+$color-accent-error: #ff8f8f;
+
+$color-gradient-start: #7c5fff;
+$color-gradient-end: #ea0c0c;
+$color-avatar-start: #4c6ef5;
+$color-avatar-end: #15aabf;
+
+$color-skeleton-base: #e0e0e0;
+$color-skeleton-highlight: #f5f5f5;
+
+$color-mood-happy-card: #253f2b;
+$color-mood-happy-hover: #202f23;
+$color-mood-relaxed-card: #2a4b48;
+$color-mood-relaxed-hover: #233435;
+$color-mood-excited-card: #442a24;
+$color-mood-excited-hover: #322020;
+$color-mood-spirited-card: #281e30;
+$color-mood-spirited-hover: #201d28;
+$color-mood-tired-card: #372f21;
+$color-mood-tired-hover: #2b251f;
+$color-mood-sad-card: #203047;
+$color-mood-sad-hover: #1e2f45;
+
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 12px;
+$radius-xl: 14px;
+$radius-pill: 999px;
+
+$shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.3);
+$shadow-md: 0 16px 40px rgba(0, 0, 0, 0.35);
+$shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.45);
+$shadow-up: 0 -14px 30px rgba(0, 0, 0, 0.35);
+$shadow-hover-sm: 0 6px 16px rgba(0, 0, 0, 0.4);

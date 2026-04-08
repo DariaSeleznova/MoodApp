@@ -2,6 +2,7 @@ import { getMoviesByMood, getTrendingMovies } from '../services/movieService';
 import { getSeriesByMood, getTrendingSeries } from '../services/movieService';
 import { getMusicByMood, getTrendingMusic } from '../services/musicService';
 import { getBooksByMood, getTrendingBooks } from '../services/bookService';
+import { renderMoviesSkeleton, renderSeriesSkeleton, renderBooksSkeleton, renderMusicSkeleton } from "../ui/render";
 import * as renderer from '../ui/render';
 import { hideBooksLoading, hideMoviesLoading, hideMusicLoading, hideSeriesLoading } from '../ui/events';
 
@@ -44,7 +45,7 @@ export async function loadTrendingBooks() {
     try {
         renderer.renderBooksSkeleton();
 
-        const books = await getTrendingBooks(3);
+        const books = await getTrendingBooks(4);
 
         renderer.renderBooks(books);
 

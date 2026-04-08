@@ -161,8 +161,8 @@ async function renderMoviesList(movies) {
 
             <div class="list-card__info">
                 <h3>${movie.title}</h3>
-                <p>⭐ ${movie.vote_average}</p>
-                <p>${movie.overview || translate('noDescription')}</p>
+                                <p class="list-card__rating">⭐ ${movie.vote_average}</p>
+                                <p class="list-card__description">${movie.overview || translate('noDescription')}</p>
                 <div class="list-card__actions">
                     ${renderTrailerButton(trailerUrl)}
                     ${renderFavoriteButton(movie.id)}
@@ -182,6 +182,14 @@ async function renderMoviesList(movies) {
             type: 'movie',
             rating: movie.vote_average,
             link: trailerUrl || undefined
+        });
+
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button, a')) {
+                return;
+            }
+
+            card.classList.toggle('active');
         });
 
         container.appendChild(card);
@@ -225,7 +233,7 @@ async function renderSeriesList(series) {
 
             <div class="list-card__info">
                 <h3>${show.name}</h3>
-                <p>⭐ ${show.vote_average}</p>
+                <p class="list-card__rating">⭐ ${show.vote_average}</p>
                 <div class="list-card__actions">
                     ${renderTrailerButton(trailerUrl)}
                     ${renderFavoriteButton(show.id)}
@@ -245,6 +253,14 @@ async function renderSeriesList(series) {
             type: 'series',
             rating: show.vote_average,
             link: trailerUrl || undefined
+        });
+
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button, a')) {
+                return;
+            }
+
+            card.classList.toggle('active');
         });
 
         container.appendChild(card);
@@ -268,6 +284,7 @@ function renderMusicList(tracks) {
             <div class="list-card__info">
                 <h3>${track.name}</h3>
                 <p>${track.artist.name}</p>
+                <a href="${track.url}" target="_blank" rel="noopener noreferrer" class="music-card__btn" data-i18n="listen">🎵 Listen</a>
             </div>
                 ${renderFavoriteButton(track.url)}
         `;
@@ -282,9 +299,19 @@ function renderMusicList(tracks) {
             link: track.url
         });
 
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button, a')) {
+                return;
+            }
+
+            card.classList.toggle('active');
+        });
+
 
         container.appendChild(card);
     });
+
+    updateTexts();
 }
 
 function renderBooksList(books) {
@@ -303,6 +330,7 @@ function renderBooksList(books) {
             <div class="list-card__info">
                 <h3>${info.title}</h3>
                 <p>${info.authors?.join(', ')}</p>
+                ${info.previewLink ? `<a href="${info.previewLink}" target="_blank" rel="noopener noreferrer" class="btn-preview" data-i18n="preview">📚 Preview</a>` : ''}
             </div>
                 ${renderFavoriteButton(book.id)}
         `;
@@ -317,8 +345,18 @@ function renderBooksList(books) {
             link: info.previewLink
         });
 
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('button, a')) {
+                return;
+            }
+
+            card.classList.toggle('active');
+        });
+
         container.appendChild(card);
     });
+
+    updateTexts();
 }
 
 function setupTrailerButton(button, trailerUrl) {

@@ -64,7 +64,7 @@ async function showMovie() {
     card.dataset.id = String(movie.id);
 
     card.innerHTML = `
-  ${renderImage(imageUrl, movie.title, '🎬')}
+    ${renderImage(imageUrl, movie.title, '🎬', 'movie-card__image')}
 
   <div class="movie-card__info">
     <h2 class="movie-card__title">${movie.title}</h2>
@@ -74,7 +74,7 @@ async function showMovie() {
     <p class="movie-card__description">
       ${movie.overview || translate('noDescription')}...
     </p>
-   <p class="movie-card__meta">
+     <p class="movie-card__meta">
       <span data-i18n="director"></span>: 🎬 ${director ? director.name : '—'}
    </p>
 
@@ -86,7 +86,7 @@ async function showMovie() {
     <span data-i18n="release"></span>: 📅 ${movie.release_date || '—'}
     </p>
     ${renderTrailerButton(trailerUrl)}
-    ${renderFavoriteButton(movie.id)}
+    ${renderFavoriteButton(movie.id, 'movie')}
   </div>
 `;
 
@@ -103,6 +103,14 @@ async function showMovie() {
         type: 'movie',
         rating: movie.vote_average,
         link: trailerUrl || undefined
+    });
+
+    card.addEventListener('click', (event) => {
+        if (event.target.closest('button, a')) {
+            return;
+        }
+
+        card.classList.toggle('active');
     });
 
     container.appendChild(card);
@@ -239,26 +247,26 @@ async function showSeries() {
     card.dataset.id = String(show.id);
 
     card.innerHTML = `
-    ${renderImage(imageUrl, show.name, '📺')}
+    ${renderImage(imageUrl, show.name, '📺', 'series-card__image')}
   <div class="series-card__info">
-    <h2>${show.name}</h2>
+        <h2 class="series-card__title">${show.name}</h2>
     
-    <p>⭐ ${show.vote_average}</p>
-    <p>${show.overview || translate('noDescription')}</p>
-    <p class = serials-card_meta>
+        <p class="series-card__rating">⭐ ${show.vote_average}</p>
+        <p class="series-card__description">${show.overview || translate('noDescription')}</p>
+        <p class="series-card__meta">
     <span data-i18n="creator"></span>: 🎬 ${creator || '—'} 
     </p>
-    <p class = serials-card_meta>
+        <p class="series-card__meta">
     🎭 ${actors || '—'}
     </p>
-    <p class = serials-card_meta>
+        <p class="series-card__meta">
     📅 ${years || '—'}
     </p>
-    <p class = serials-card_meta>
+        <p class="series-card__meta">
     ${seasons} <span data-i18n="seasonsLabel"></span>
     </p>
     ${renderTrailerButton(trailerUrl)}
-    ${renderFavoriteButton(show.id)}
+    ${renderFavoriteButton(show.id, 'series')}
   </div>
 `;
     const favBtn = card.querySelector('.btn-fav');
@@ -274,6 +282,14 @@ async function showSeries() {
         type: 'series',
         rating: show.vote_average,
         link: trailerUrl || undefined
+    });
+
+    card.addEventListener('click', (event) => {
+        if (event.target.closest('button, a')) {
+            return;
+        }
+
+        card.classList.toggle('active');
     });
 
     container.appendChild(card);
@@ -376,7 +392,7 @@ export function renderMusic(tracks) {
 
                 <a href="${track.url}" target="_blank" class="music-card__btn" data-i18n="listen">🎵
                 </a>
-                ${renderFavoriteButton(track.url)}
+                ${renderFavoriteButton(track.url, 'music')}
             </div>
         `;
         const favBtn = card.querySelector('.btn-fav');
@@ -420,7 +436,7 @@ export function renderBooks(books) {
 
                 <a href="${link}" target="_blank" class="book-card__btn" data-i18n="preview">
                 </a>
-                ${renderFavoriteButton(book.id)}
+                ${renderFavoriteButton(book.id, 'book')}
             </div>
         `;
         const favBtn = card.querySelector('.btn-fav');

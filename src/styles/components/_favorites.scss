@@ -1,17 +1,5 @@
-@use "sass:map";
-$breakpoints: (
-    sm: 426px,
-    md: 768px,
-    lg: 1023px,
-    xl: 1440px,
-    xxl: 1920px,
-);
-
-@mixin respond-max($size) {
-    @media (max-width: map.get($breakpoints, $size)) {
-        @content;
-    }
-}
+@use '../base/variables' as v;
+@use '../base/mixins' as m;
 
 .fan-header {
     display: flex;
@@ -19,7 +7,7 @@ $breakpoints: (
     justify-content: space-between;
     align-items: baseline;
 
-    @include respond-max(lg) {
+    @include m.respond-max(lg) {
         align-items: stretch;
     }
 
@@ -29,8 +17,12 @@ $breakpoints: (
         img {
             width: 250px;
 
-            @include respond-max(lg) {
+            @include m.respond-max(lg) {
                 width: 150px;
+            }
+
+            @include m.respond-max(sm) {
+                width: 120px;
             }
         }
     }
@@ -38,8 +30,13 @@ $breakpoints: (
     h1 {
         font-size: 50px;
 
-        @include respond-max(lg) {
+        @include m.respond-max(lg) {
             font-size: 30px;
+        }
+
+        @include m.respond-max(sm) {
+            margin-top: 0;
+            font-size: 20px;
         }
     }
 }
@@ -49,7 +46,7 @@ $breakpoints: (
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 
-    @include respond-max(lg) {
+    @include m.respond-max(lg) {
         display: flex;
         flex-direction: column;
     }
@@ -57,14 +54,14 @@ $breakpoints: (
     h2 {
         font-size: 40px;
 
-        @include respond-max(lg) {
+        @include m.respond-max(lg) {
             font-size: 20px;
         }
 
-        @include respond-max(sm) {
+        @include m.respond-max(sm) {
             margin: 30px auto 0;
             text-align: center;
-            font-size: 30px;
+            font-size: 25px;
         }
     }
 
@@ -81,73 +78,59 @@ $breakpoints: (
 #fav-music,
 #fav-series,
 #fav-books {
-
-    // Risky: this changes mobile card flow and alignment for all favorites lists.
-    @include respond-max(lg) {
+    @include m.respond-max(lg) {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
     }
 
-    @include respond-max(sm) {
+    @include m.respond-max(sm) {
         align-items: center;
         position: relative;
     }
 }
 
 .fav-card {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-
-    background: #1c1c1c;
-    color: white;
-
-    padding: 10px;
-    border-radius: 10px;
+    @include m.favorites-card-shell;
     margin-bottom: 10px;
-    position: relative;
-    transition: transform 0.2s ease;
 
-    @include respond-max(lg) {
+    @include m.respond-max(lg) {
         width: 100%;
     }
 
-    @include respond-max(sm) {
+    @include m.respond-max(sm) {
         flex-direction: column;
     }
 
-    &:hover {
-        transform: scale(1.01);
-    }
-
-    // Risky: controls subtitle visibility logic (hidden on sm, shown for active card).
     &.active .fav-card__subtitle {
         display: block;
     }
 
     &__subtitle {
-        @include respond-max(lg) {
+        @include m.respond-max(lg) {
             font-size: 14px;
         }
 
-        @include respond-max(sm) {
+        @include m.respond-max(sm) {
             display: none;
+            font-size: 12px;
         }
     }
 
     &__image img {
-        width: 140px;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 6px;
+        @include m.favorites-card-media;
+
+        @include m.respond-max(sm) {
+            width: 120px;
+            height: 170px;
+        }
     }
 
     &__placeholder {
         width: 60px;
         height: 90px;
-        background: #333;
-        border-radius: 6px;
+        background: v.$color-surface-muted;
+        border-radius: v.$radius-sm;
 
         display: flex;
         align-items: center;
@@ -159,7 +142,7 @@ $breakpoints: (
         display: flex;
         flex-direction: column;
 
-        @include respond-max(sm) {
+        @include m.respond-max(sm) {
             align-items: center;
         }
     }
@@ -184,11 +167,11 @@ $breakpoints: (
     right: 0;
     top: 0;
     position: absolute;
-    background: #333;
+    background: v.$color-surface-muted;
     border: none;
-    color: white;
+    color: v.$color-text-primary;
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: v.$radius-sm;
     font-size: 12px;
     cursor: pointer;
     text-decoration: none;
@@ -196,7 +179,7 @@ $breakpoints: (
     transition: background 0.2s ease;
 
     &:hover {
-        background: #444;
+        background: v.$color-surface-muted-hover;
     }
 }
 
@@ -205,27 +188,32 @@ $breakpoints: (
     background: transparent;
 
     &:hover {
-        color: #e50914;
+        color: v.$color-accent-red;
     }
 }
 
 .fav-trailer {
-    border-radius: 12px;
+    border-radius: v.$radius-lg;
     border: none;
-    color: white;
+    color: v.$color-text-primary;
     text-decoration: none;
     padding: 10px 55px;
+
+    @include m.respond-max(sm) {
+        padding: 10px 45px;
+        font-size: 14px;
+    }
 }
 
 .empty-state {
     text-align: center;
     padding: 20px;
-    color: #aaa;
+    color: v.$color-text-muted;
 
     a {
         display: inline-block;
         margin-top: 8px;
-        color: #4dabf7;
+        color: v.$color-accent-blue;
         text-decoration: none;
 
         &:hover {
@@ -241,23 +229,21 @@ $breakpoints: (
 }
 
 .music-card__btn {
-    color: #00bcd4;
+    color: v.$color-accent-teal;
 }
 
 .btn-preview {
-    color: #ffc107;
+    color: v.$color-accent-yellow;
 }
 
-//Доделать стили для кнопки "Подробнее" на мобильных устройствах, чтобы она не перекрывала другие элементы и была легко доступна для клика.
 .fav-more-btn {
-    color: #03a9f4;
+    color: v.$color-accent-cyan;
     background-color: transparent;
     border: none;
-    font-family: "Balsamiq Sans", sans-serif;
+    font-family: v.$font-family-base;
     font-size: 20px;
 
-    // Risky: absolute positioning on small screens affects button overlap/click area.
-    @include respond-max(sm) {
+    @include m.respond-max(sm) {
         position: absolute;
         bottom: -20px;
         right: 10px;

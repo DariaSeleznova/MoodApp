@@ -14,9 +14,40 @@ function getDisplayName(user) {
     return getUserName(user, translate('profile.userFallback'));
 }
 
+function escapeHtmlAttribute(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function getSafePhotoUrl(user) {
+    if (typeof user?.photoURL !== 'string') {
+        return '';
+    }
+
+    const trimmedPhotoUrl = user.photoURL.trim();
+
+    if (!trimmedPhotoUrl) {
+        return '';
+    }
+
+    try {
+        const parsedUrl = new URL(trimmedPhotoUrl, window.location.origin);
+        const isHttpUrl = parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+        return isHttpUrl ? parsedUrl.href : '';
+    } catch {
+        return '';
+    }
+}
+
 function getAvatarContent(user) {
-    if (user?.photoURL) {
-        return `<img src="${user.photoURL}" alt="${getDisplayName(user)}">`;
+    const safePhotoUrl = getSafePhotoUrl(user);
+
+    if (safePhotoUrl) {
+        return `<img src="${escapeHtmlAttribute(safePhotoUrl)}" alt="${escapeHtmlAttribute(getDisplayName(user))}" referrerpolicy="no-referrer">`;
     }
 
     return `
@@ -132,6 +163,14 @@ export function initProfileMenu() {
             }
 
             avatar.innerHTML = getAvatarContent(user);
+            const avatarImage = avatar.querySelector('img');
+
+            if (avatarImage) {
+                avatarImage.addEventListener('error', () => {
+                    avatar.innerHTML = getAvatarContent(null);
+                }, { once: true });
+            }
+
             triggerName.textContent = getUserName(user, translate('profile.userFallback'));
             updateGreetingContent(user, greetingTitle, greetingText);
         });

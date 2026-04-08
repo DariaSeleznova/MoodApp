@@ -12,9 +12,14 @@ function normalizeId(id) {
     return String(id);
 }
 
-export function isFavorite(id) {
+export function isFavorite(id, type) {
     const normalizedId = normalizeId(id);
-    return readFavorites().some(item => normalizeId(item.id) === normalizedId);
+
+    return readFavorites().some(
+        item =>
+            normalizeId(item.id) === normalizedId &&
+            item.type === type
+    );
 }
 
 export function getFavoritesFromStorage() {

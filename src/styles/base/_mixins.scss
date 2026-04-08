@@ -1,0 +1,72 @@
+@use 'sass:map';
+@use './variables' as v;
+
+@mixin respond-max($size) {
+    @media (max-width: map.get(v.$breakpoints, $size)) {
+        @content;
+    }
+}
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin card-base {
+    display: flex;
+    gap: 20px;
+    background: v.$color-surface;
+    color: v.$color-text-primary;
+    border-radius: v.$radius-lg;
+    padding: 6px;
+    box-shadow: v.$shadow-sm;
+}
+
+@mixin small-card-base {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: v.$color-surface;
+    color: v.$color-text-primary;
+    padding: 12px;
+    border-radius: v.$radius-md;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease, background 0.2s ease;
+
+    &:hover {
+        transform: scale(1.02);
+        background: v.$color-surface-hover;
+    }
+}
+
+@mixin card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 70%;
+}
+
+@mixin favorites-card-shell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: v.$color-surface;
+    color: v.$color-text-primary;
+    padding: 10px;
+    border-radius: v.$radius-md;
+    position: relative;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.01);
+    }
+}
+
+@mixin favorites-card-media($width: 140px, $height: 200px) {
+    width: $width;
+    height: $height;
+    object-fit: cover;
+    border-radius: v.$radius-sm;
+}

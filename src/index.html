@@ -13,7 +13,7 @@
 
 <body>
     <header class="container">
-        <div class="logo"><img class="logo" alt="MoodApp logo"></div>
+        <div class="logo"><img class="logo " alt="MoodApp logo"></div>
         <nav class="mood-nav">
             <button class="mood-btn" data-mood="happy"></button>
             <button class="mood-btn" data-mood="relaxed"></button>
@@ -25,27 +25,30 @@
         <div class="client-area">
             <button class="btn btn-ghost login-btn" data-i18n="login">Login</button>
             <div class="language-switch" id="lang-switch">
-                <button
-                    class="language-switch__trigger"
-                    type="button"
-                    aria-haspopup="menu"
-                    aria-expanded="false"
-                    aria-label="Select language"
-                >
+                <button class="language-switch__trigger" type="button" aria-haspopup="menu" aria-expanded="false"
+                    aria-label="Select language">
                     <span class="language-switch__label">EN</span>
                     <span class="language-switch__chevron" aria-hidden="true">▾</span>
                 </button>
                 <div class="language-switch__menu" role="menu">
-                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="en">English</button>
-                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="uk">Українська</button>
-                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="pl">Polski</button>
-                    <button class="language-switch__option" type="button" role="menuitemradio" data-lang="es">Español</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio"
+                        data-lang="en">English</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio"
+                        data-lang="uk">Українська</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio"
+                        data-lang="pl">Polski</button>
+                    <button class="language-switch__option" type="button" role="menuitemradio"
+                        data-lang="es">Español</button>
                 </div>
             </div>
         </div>
+
     </header>
+    <div class="mood-backdrop" data-mood-backdrop></div>
     <div class="title_app container">
         <h1 data-i18n="chooseYourMood" class="gradient-text">Выбери свое настроение</h1>
+        <button class="mood-toggle" type="button" aria-controls="mood-nav" aria-expanded="false"
+            data-mood-toggle>Mood</button>
     </div>
     <div class="app container">
         <section class="movies">

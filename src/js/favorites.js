@@ -126,7 +126,14 @@ function createFavoriteCard(item) {
         await removeFromFavorites(item.id, getCurrentUser());
 
         const updatedList = getFavorites().filter(i => i.type === item.type);
-        const containerId = `fav-${item.type}`;
+        const containerMap = {
+            movie: 'fav-movies',
+            series: 'fav-series',
+            music: 'fav-music',
+            book: 'fav-books'
+        };
+
+        const containerId = containerMap[item.type];
 
         renderFavorites(updatedList, containerId);
     });
