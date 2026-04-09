@@ -2,6 +2,7 @@ import '../styles/main.scss';
 import { getFavorites, removeFromFavorites } from './services/favoritesService';
 import { updateTexts } from '../js/i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
+import imgBook from '../assets/icons/imgBook.png';
 
 function loadAuthService() {
     return import('./services/authService.js');
@@ -94,7 +95,7 @@ function createFavoriteCard(item) {
         <div class="fav-card__image">
             ${imageUrl
             ? `<img src="${imageUrl}" />`
-            : `<div class="fav-card__placeholder">⭐</div>`
+            : `<div class="fav-card__placeholder"><img src="${imgBook}" alt="${title}" /></div>`
         }
         </div>
 
@@ -147,6 +148,15 @@ function createFavoriteCard(item) {
 
 
 function getLinkData(item) {
+    if (item.type === 'book' && item.link && !item.previewLink) {
+        return {
+            url: item.link,
+            textKey: 'preview',
+            defaultText: '📚 Preview',
+            className: 'btn-preview'
+        };
+    }
+
     if (item.link) {
         return {
             url: item.link,

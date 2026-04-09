@@ -2,16 +2,18 @@ import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
 import { renderFavoriteButton, renderImage, renderTrailerButton } from '../utils/renderHelper.js';
+import imgBook from '../../assets/icons/imgBook.png';
 
 const AUTOPLAY_DELAY = 10000;
 
+// Movie carousel state
 let currentIndex = 0;
 let moviesData = [];
 let moviesAutoplayId = null;
 let isMoviesHovered = false;
 let moviesHoverBound = false;
 
-// 🎬 фильмы (карусель)
+// Movies carousel
 export function renderMovies(movies) {
     moviesData = movies;
     currentIndex = 0;
@@ -41,8 +43,6 @@ async function showMovie() {
         details = await getMovieDetails(movie.id);
     } catch (error) {
         console.warn('Failed to load movie details', error);
-
-        // fallback (запасные данные)
         details = {
             overview: 'No description available',
             runtime: null,
@@ -189,12 +189,15 @@ export function prevMovie() {
     resetMoviesAutoplay();
     showMovie();
 }
+
+// Series carousel state
 let currentSeriesIndex = 0;
 let seriesData = [];
 let seriesAutoplayId = null;
 let isSeriesHovered = false;
 let seriesHoverBound = false;
 
+// Series carousel
 export function renderSeries(series) {
     seriesData = series;
     currentSeriesIndex = 0;
@@ -224,8 +227,6 @@ async function showSeries() {
         details = await getSeriesDetails(show.id);
     } catch (error) {
         console.warn('Failed to load series details', error);
-
-        // fallback (запасные данные)
         details = {
             overview: 'No description available',
             runtime: null,
@@ -275,7 +276,7 @@ async function showSeries() {
 
     setupTrailerButton(trailerBtn, trailerUrl);
 
-    setupFavoriteButton(favBtn, {//берем данные для объекта
+    setupFavoriteButton(favBtn, {
         id: show.id,
         title: show.name,
         subtitle: show.overview,
@@ -297,6 +298,7 @@ async function showSeries() {
     updateTexts();
 }
 
+// Shared UI helpers
 function setupTrailerButton(button, trailerUrl) {
     if (!button) {
         return;
@@ -366,6 +368,7 @@ export function prevSeries() {
     showSeries();
 }
 
+// Content lists
 export function renderMusic(tracks) {
     const container = document.getElementById('music-list');
     container.innerHTML = '';
@@ -419,19 +422,27 @@ export function renderBooks(books) {
     container.innerHTML = '';
 
     books.forEach(book => {
-        const info = book.volumeInfo;
-        const title = info.title;
-        const authors = info.authors?.join(', ') || translate('unknownAuthor');
-        const link = info.previewLink;
-        const image = info.imageLinks?.thumbnail;
+        const title = book.title;
+
+        const authors = book.authors
+            ?.map(a => a.name)
+            .join(', ') || translate('unknownAuthor');
+
+        const link = book.key
+            ? `https://openlibrary.org${book.key}`
+            : '#';
+
+        const image = book.cover_id
+            ? `https://covers.openlibrary.org/b/id/${book.cover_id}-M.jpg`
+            : null;
 
         const card = document.createElement('div');
         card.classList.add('book-card', 'fade-in');
-        card.dataset.id = String(book.id);
+        card.dataset.id = String(book.key || title);
         card.dataset.type = 'book';
 
         card.innerHTML = `
-            ${renderImage(image, title, '📚')}
+            ${renderImage(image, title, `<img src="${imgBook}" alt="${title}" />`)}
 
             <div class="book-card__info">
                 <p class="book-card__title">${title}</p>
@@ -439,17 +450,19 @@ export function renderBooks(books) {
 
                 <a href="${link}" target="_blank" class="book-card__btn" data-i18n="preview">
                 </a>
-                ${renderFavoriteButton(book.id, 'book')}
+                ${renderFavoriteButton(book.key || title, 'book')}
             </div>
         `;
+
         const favBtn = card.querySelector('.btn-fav');
+
         setupFavoriteButton(favBtn, {
-            id: book.id,
-            title: info.title,
-            subtitle: info.authors?.join(', ') || translate('unknownAuthor'),
-            image: info.imageLinks?.thumbnail,
+            id: book.key || title,
+            title: title,
+            subtitle: authors,
+            image: image,
             type: 'book',
-            previewLink: info.previewLink
+            previewLink: link
         });
 
         container.appendChild(card);
@@ -457,6 +470,8 @@ export function renderBooks(books) {
 
     updateTexts();
 }
+
+// Generic UI states
 export function showLoading() {
     document.querySelector('.loader')?.classList.remove('hidden');
 }
@@ -477,6 +492,7 @@ export function showError(key, containerId) {
     updateTexts();
 }
 
+// Skeleton renderers
 export function renderMoviesSkeleton() {
     const container = document.getElementById('movies-list');
 
@@ -514,5 +530,3 @@ export function renderMusicSkeleton() {
         <div class="skeleton-line"></div>
     `;
 }
-
-

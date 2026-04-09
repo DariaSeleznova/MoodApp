@@ -13,6 +13,7 @@ import { getMusicByMood, getTrendingMusic } from './services/musicService';
 import { setupFavoriteButton } from './utils/favoriteHandler.js';
 import { updateTexts, translate } from './i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
+import imgBook from '../assets/icons/imgBook.png';
 import { renderFavoriteButton, renderImage, renderTrailerButton } from './utils/renderHelper.js';
 
 const params = new URLSearchParams(window.location.search);
@@ -318,32 +319,42 @@ function renderBooksList(books) {
     container.innerHTML = '';
 
     books.forEach(book => {
-        const info = book.volumeInfo;
+        const title = book.title;
+        const authors = book.authors
+            ?.map(a => a.name)
+            .join(', ') || translate('unknownAuthor');
+        const previewLink = book.key
+            ? `https://openlibrary.org${book.key}`
+            : '#';
+        const image = book.cover_id
+            ? `https://covers.openlibrary.org/b/id/${book.cover_id}-M.jpg`
+            : null;
 
         const card = document.createElement('div');
         card.classList.add('list-card');
-        card.dataset.id = String(book.id);
+        card.dataset.id = String(book.key || title);
         card.dataset.type = 'book';
 
         card.innerHTML = `
-        ${renderImage(info.imageLinks?.thumbnail, info.title, '📚')}
+        ${renderImage(image, title, `<img src="${imgBook}" alt="${title}" />`)}
 
             <div class="list-card__info">
-                <h3>${info.title}</h3>
-                <p>${info.authors?.join(', ')}</p>
-                ${info.previewLink ? `<a href="${info.previewLink}" target="_blank" rel="noopener noreferrer" class="btn-preview" data-i18n="preview">📚 Preview</a>` : ''}
+                <h3>${title}</h3>
+                <p>${authors}</p>
+                <a href="${previewLink}" target="_blank" rel="noopener noreferrer" class="btn-preview" data-i18n="preview">📚 Preview</a>
             </div>
-                ${renderFavoriteButton(book.id, 'book')}
+                ${renderFavoriteButton(book.key || title, 'book')}
         `;
 
         const favBtn = card.querySelector('.btn-fav');
 
         setupFavoriteButton(favBtn, {
-            id: book.id,
-            title: info.title,
-            image: info.imageLinks?.thumbnail,
+            id: book.key || title,
+            title: title,
+            subtitle: authors,
+            image: image,
             type: 'book',
-            link: info.previewLink
+            previewLink
         });
 
         card.addEventListener('click', (e) => {

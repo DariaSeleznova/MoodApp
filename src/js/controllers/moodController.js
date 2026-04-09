@@ -120,7 +120,7 @@ export async function loadBooks(mood) {
         renderBooksSkeleton();
         const requestId = ++booksRequestId;
 
-        const books = await getBooksByMood(mood, 3);
+        const books = await getBooksByMood(mood, 4);
         if (requestId !== booksRequestId) return;
 
         renderer.renderBooks(books);
