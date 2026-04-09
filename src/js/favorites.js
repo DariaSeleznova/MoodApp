@@ -91,6 +91,9 @@ function createFavoriteCard(item) {
     const title = item.title;
     const subtitle = item.subtitle;
     const linkData = getLinkData(item);
+    const subtitleMarkup = subtitle
+        ? `<p class="fav-card__subtitle">${subtitle}</p>`
+        : '';
     const ratingMarkup = (item.type === 'movie' || item.type === 'series')
         ? renderTmdbRating(item.rating, 'fav-card__rating')
         : '';
@@ -105,7 +108,7 @@ function createFavoriteCard(item) {
 
         <div class="fav-card__info">
             <h3 class="fav-card__title">${title}</h3>
-            <p class="fav-card__subtitle">${subtitle}</p>
+            ${subtitleMarkup}
             ${ratingMarkup}
 
             <div class="fav-card__actions">
@@ -153,6 +156,21 @@ function createFavoriteCard(item) {
 
 
 function getLinkData(item) {
+    if (item.type === 'music') {
+        const url = item.listenLink || item.link;
+
+        if (!url) {
+            return null;
+        }
+
+        return {
+            url,
+            textKey: 'listen',
+            defaultText: '🎵 Listen',
+            className: 'music-card__btn'
+        };
+    }
+
     if (item.type === 'book' && item.link && !item.previewLink) {
         return {
             url: item.link,
@@ -178,14 +196,6 @@ function getLinkData(item) {
             defaultText: '📚 Preview',
             className: 'btn-preview'
         };
-    }
-    if (item.listenLink) {
-        return {
-            url: item.listenLink,
-            textKey: 'listen',
-            defaultText: '🎵 Listen',
-            className: 'music-card__btn'
-        }
     }
 
     return null;

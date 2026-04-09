@@ -177,6 +177,7 @@ async function renderMoviesList(movies) {
         setupFavoriteButton(favBtn, {
             id: movie.id,
             title: movie.title,
+            subtitle: movie.overview || translate('noDescription'),
             image: movie.poster_path,
             type: 'movie',
             rating: movie.vote_average,
@@ -249,6 +250,7 @@ async function renderSeriesList(series) {
         setupFavoriteButton(favBtn, {
             id: show.id,
             title: show.name,
+            subtitle: show.overview || translate('noDescription'),
             image: show.poster_path,
             type: 'series',
             rating: show.vote_average,
@@ -295,9 +297,10 @@ function renderMusicList(tracks) {
         setupFavoriteButton(favBtn, {
             id: track.url,
             title: track.name,
+            subtitle: track.artist?.name || translate('unknownAuthor'),
             image: track.image,
             type: 'music',
-            link: track.url
+            listenLink: track.url
         });
 
         card.addEventListener('click', (e) => {
