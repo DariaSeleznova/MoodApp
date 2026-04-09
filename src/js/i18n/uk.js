@@ -8,7 +8,7 @@ export default {
     login: "Вхід",
     signup: "Реєстрація",
     logout: "Вийти",
-    favorites: "Улюблені",
+    favorites: "❤️ Улюблені",
     close: "Закрити",
     continueWithGoogle: "Продовжити з Google",
     createAccount: "Створити акаунт",

@@ -8,7 +8,7 @@ export default {
     login: "Login",
     signup: "Sign Up",
     logout: "Logout",
-    favorites: "Favorites",
+    favorites: "❤️ Favorites",
     close: "Close",
     continueWithGoogle: "Continue with Google",
     createAccount: "Create Account",
