@@ -26,12 +26,18 @@ export function updateFavoritesUI() {
 
     document.querySelectorAll(cardSelector).forEach((card) => {
         const favoriteButton = card.querySelector('.btn-fav');
+        const cardType = card.dataset.type;
 
         if (!favoriteButton) {
             return;
         }
 
-        favoriteButton.classList.toggle('active', isFavorite(card.dataset.id));
+        if (!cardType) {
+            favoriteButton.classList.remove('active');
+            return;
+        }
+
+        favoriteButton.classList.toggle('active', isFavorite(card.dataset.id, cardType));
     });
 }
 
@@ -60,7 +66,9 @@ export async function toggleFavorite(item, user = null) {
     );
     const exists = Boolean(existingFavorite);
     const updated = exists
-        ? favorites.filter(fav => String(fav.id) !== String(item.id))
+        ? favorites.filter(
+            fav => !(String(fav.id) === String(item.id) && fav.type === item.type)
+        )
         : [...favorites, item];
 
     writeFavorites(updated);
@@ -87,9 +95,7 @@ export async function toggleFavorite(item, user = null) {
 export async function removeFromFavorites(id, user = null) {
     const favorites = readFavorites();
     const existingFavorite = favorites.find(
-        fav =>
-            String(fav.id) === String(item.id) &&
-            fav.type === item.type
+        fav => String(fav.id) === String(id)
     );
     const updated = favorites.filter(item => String(item.id) !== String(id));
 

@@ -10,7 +10,6 @@ import {
 } from './services/movieService';
 import { getBooksByMood, getTrendingBooks } from './services/bookService';
 import { getMusicByMood, getTrendingMusic } from './services/musicService';
-import { isFavorite } from './utils/favoritesStorage.js';
 import { setupFavoriteButton } from './utils/favoriteHandler.js';
 import { updateTexts, translate } from './i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
@@ -81,8 +80,7 @@ async function loadList() {
     } catch (error) {
         console.error('Load list error:', error);
 
-        // 👉 controlled error state
-        const container = document.querySelector('#list-container'); // поправь под свой класс
+        const container = document.querySelector('#list-container');
 
         container.innerHTML = `
             <div class="error-state">
@@ -93,7 +91,6 @@ async function loadList() {
 
         updateTexts();
 
-        // 👉 кнопка "повторить"
         const retryBtn = container.querySelector('.btn-retry');
         retryBtn.addEventListener('click', loadList);
     }
@@ -151,6 +148,7 @@ async function renderMoviesList(movies) {
         const card = document.createElement('div');
         card.classList.add('list-card');
         card.dataset.id = String(movie.id);
+        card.dataset.type = 'movie';
 
         const imageUrl = movie.poster_path
             ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
@@ -165,7 +163,7 @@ async function renderMoviesList(movies) {
                                 <p class="list-card__description">${movie.overview || translate('noDescription')}</p>
                 <div class="list-card__actions">
                     ${renderTrailerButton(trailerUrl)}
-                    ${renderFavoriteButton(movie.id)}
+                    ${renderFavoriteButton(movie.id, 'movie')}
                 </div>
             </div>
         `;
@@ -223,6 +221,7 @@ async function renderSeriesList(series) {
         const card = document.createElement('div');
         card.classList.add('list-card');
         card.dataset.id = String(show.id);
+        card.dataset.type = 'series';
 
         const imageUrl = show.poster_path
             ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
@@ -236,7 +235,7 @@ async function renderSeriesList(series) {
                 <p class="list-card__rating">⭐ ${show.vote_average}</p>
                 <div class="list-card__actions">
                     ${renderTrailerButton(trailerUrl)}
-                    ${renderFavoriteButton(show.id)}
+                    ${renderFavoriteButton(show.id, 'series')}
                 </div>
             </div>
         `;
@@ -276,6 +275,7 @@ function renderMusicList(tracks) {
         const card = document.createElement('div');
         card.classList.add('list-card');
         card.dataset.id = String(track.url);
+        card.dataset.type = 'music';
 
         const imageUrl = track.image;
 
@@ -286,7 +286,7 @@ function renderMusicList(tracks) {
                 <p>${track.artist.name}</p>
                 <a href="${track.url}" target="_blank" rel="noopener noreferrer" class="music-card__btn" data-i18n="listen">🎵 Listen</a>
             </div>
-                ${renderFavoriteButton(track.url)}
+                ${renderFavoriteButton(track.url, 'music')}
         `;
 
         const favBtn = card.querySelector('.btn-fav');
@@ -323,6 +323,7 @@ function renderBooksList(books) {
         const card = document.createElement('div');
         card.classList.add('list-card');
         card.dataset.id = String(book.id);
+        card.dataset.type = 'book';
 
         card.innerHTML = `
         ${renderImage(info.imageLinks?.thumbnail, info.title, '📚')}
@@ -332,7 +333,7 @@ function renderBooksList(books) {
                 <p>${info.authors?.join(', ')}</p>
                 ${info.previewLink ? `<a href="${info.previewLink}" target="_blank" rel="noopener noreferrer" class="btn-preview" data-i18n="preview">📚 Preview</a>` : ''}
             </div>
-                ${renderFavoriteButton(book.id)}
+                ${renderFavoriteButton(book.id, 'book')}
         `;
 
         const favBtn = card.querySelector('.btn-fav');

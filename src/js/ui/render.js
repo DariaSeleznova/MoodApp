@@ -1,4 +1,3 @@
-import { isFavorite } from '../utils/favoritesStorage.js';
 import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
@@ -62,6 +61,7 @@ async function showMovie() {
     const card = document.createElement('div');
     card.classList.add('movie-card', 'fade-in');
     card.dataset.id = String(movie.id);
+    card.dataset.type = 'movie';
 
     card.innerHTML = `
     ${renderImage(imageUrl, movie.title, '🎬', 'movie-card__image')}
@@ -245,6 +245,7 @@ async function showSeries() {
     const card = document.createElement('div');
     card.classList.add('series-card');
     card.dataset.id = String(show.id);
+    card.dataset.type = 'series';
 
     card.innerHTML = `
     ${renderImage(imageUrl, show.name, '📺', 'series-card__image')}
@@ -382,6 +383,7 @@ export function renderMusic(tracks) {
         const card = document.createElement('div');
         card.classList.add('music-card', 'fade-in');
         card.dataset.id = String(track.url);
+        card.dataset.type = 'music';
 
         card.innerHTML = `
                 ${renderImage(imageUrl, track.name, '🎵')}
@@ -426,6 +428,7 @@ export function renderBooks(books) {
         const card = document.createElement('div');
         card.classList.add('book-card', 'fade-in');
         card.dataset.id = String(book.id);
+        card.dataset.type = 'book';
 
         card.innerHTML = `
             ${renderImage(image, title, '📚')}

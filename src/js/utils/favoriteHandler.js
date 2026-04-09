@@ -28,7 +28,7 @@ async function applyFavoriteToggle(button, item) {
 
 export function setupFavoriteButton(button, item) {
 
-    if (isFavorite(item.id)) {
+    if (isFavorite(item.id, item.type)) {
         button.classList.add('active');
     }
 
