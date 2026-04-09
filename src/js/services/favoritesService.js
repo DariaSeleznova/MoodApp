@@ -10,6 +10,16 @@ function isFavoriteRecord(item) {
     return Boolean(item) && typeof item === 'object' && 'id' in item;
 }
 
+function sanitizeFavoriteItem(item) {
+    if (!item || typeof item !== 'object') {
+        return item;
+    }
+
+    return Object.fromEntries(
+        Object.entries(item).filter(([, value]) => value !== undefined)
+    );
+}
+
 export function writeFavorites(favorites) {
     writeFavoritesToStorage(favorites);
     updateFavoritesUI();
@@ -58,18 +68,24 @@ export async function syncFavoritesForUser(user) {
 }
 
 export async function toggleFavorite(item, user = null) {
+    const normalizedItem = sanitizeFavoriteItem(item);
+
+    if (!normalizedItem || normalizedItem.id === undefined || !normalizedItem.type) {
+        throw new Error('Invalid favorite item');
+    }
+
     const favorites = readFavorites();
     const existingFavorite = favorites.find(
         fav =>
-            String(fav.id) === String(item.id) &&
-            fav.type === item.type
+            String(fav.id) === String(normalizedItem.id) &&
+            fav.type === normalizedItem.type
     );
     const exists = Boolean(existingFavorite);
     const updated = exists
         ? favorites.filter(
-            fav => !(String(fav.id) === String(item.id) && fav.type === item.type)
+            fav => !(String(fav.id) === String(normalizedItem.id) && fav.type === normalizedItem.type)
         )
-        : [...favorites, item];
+        : [...favorites, normalizedItem];
 
     writeFavorites(updated);
 
@@ -80,7 +96,7 @@ export async function toggleFavorite(item, user = null) {
             if (exists) {
                 await removeUserFavorite(user.uid, existingFavorite);
             } else {
-                await addUserFavorite(user.uid, item);
+                await addUserFavorite(user.uid, normalizedItem);
             }
         } catch (error) {
             writeFavorites(favorites);
