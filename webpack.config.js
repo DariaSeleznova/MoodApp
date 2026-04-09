@@ -13,7 +13,7 @@ module.exports = {
     },
 
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'docs'),
         filename: '[name].bundle.js',
         clean: true
     },
@@ -21,7 +21,7 @@ module.exports = {
     mode: 'development',
 
     devServer: {
-        static: './dist',
+        static: './docs',
         port: 3000,
         open: true
     },
