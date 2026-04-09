@@ -3,6 +3,7 @@ import { getFavorites, removeFromFavorites } from './services/favoritesService';
 import { updateTexts } from '../js/i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
 import imgBook from '../assets/icons/imgBook.png';
+import { renderTmdbRating } from './utils/renderHelper.js';
 
 function loadAuthService() {
     return import('./services/authService.js');
@@ -90,6 +91,9 @@ function createFavoriteCard(item) {
     const title = item.title;
     const subtitle = item.subtitle;
     const linkData = getLinkData(item);
+    const ratingMarkup = (item.type === 'movie' || item.type === 'series')
+        ? renderTmdbRating(item.rating, 'fav-card__rating')
+        : '';
 
     card.innerHTML = `
         <div class="fav-card__image">
@@ -102,6 +106,7 @@ function createFavoriteCard(item) {
         <div class="fav-card__info">
             <h3 class="fav-card__title">${title}</h3>
             <p class="fav-card__subtitle">${subtitle}</p>
+            ${ratingMarkup}
 
             <div class="fav-card__actions">
                 ${linkData ? `

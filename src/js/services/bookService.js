@@ -1,8 +1,4 @@
-import { getBooksLanguage } from "../i18n/i18n";
-
-
 export async function getBooksByMood(mood, limit = 12) {
-    const language = getBooksLanguage();
     const subjectMap = {
         happy: 'humor',
         sad: 'romance',
@@ -12,7 +8,7 @@ export async function getBooksByMood(mood, limit = 12) {
         spirited: 'biography'
     };
 
-    const subject = `${subjectMap[mood]} ${language || 'english'}`;
+    const subject = subjectMap[mood] || 'fiction';
 
     const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(subject)}&limit=${limit}`;
 
@@ -23,7 +19,12 @@ export async function getBooksByMood(mood, limit = 12) {
     }
 
     const data = await res.json();
-    return data.works || [];
+    return (data.docs || []).map((book) => ({
+        title: book.title,
+        authors: (book.author_name || []).map((name) => ({ name })),
+        key: book.key,
+        cover_id: book.cover_i ?? null
+    }));
 }
 
 export async function getTrendingBooks(limit = 30) {

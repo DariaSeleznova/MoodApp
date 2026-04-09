@@ -60,6 +60,7 @@ export default {
     noDescription: "Опис недоступний",
     unknownAuthor: "Невідомий автор",
     trending: "Популярні",
+    dataSources: "Джерела даних:",
     noFavoriteMovies: "Поки що немає улюблених фільмів",
     noFavoriteSeries: "Поки що немає улюблених серіалів",
     noFavoriteMusic: "Поки що немає улюбленої музики",

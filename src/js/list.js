@@ -14,7 +14,7 @@ import { setupFavoriteButton } from './utils/favoriteHandler.js';
 import { updateTexts, translate } from './i18n/i18n.js';
 import logo from '../assets/icons/logo.png';
 import imgBook from '../assets/icons/imgBook.png';
-import { renderFavoriteButton, renderImage, renderTrailerButton } from './utils/renderHelper.js';
+import { renderFavoriteButton, renderImage, renderTmdbRating, renderTrailerButton } from './utils/renderHelper.js';
 
 const params = new URLSearchParams(window.location.search);
 
@@ -160,8 +160,8 @@ async function renderMoviesList(movies) {
 
             <div class="list-card__info">
                 <h3>${movie.title}</h3>
-                                <p class="list-card__rating">⭐ ${movie.vote_average}</p>
-                                <p class="list-card__description">${movie.overview || translate('noDescription')}</p>
+                ${renderTmdbRating(movie.vote_average, 'list-card__rating')}
+                <p class="list-card__description">${movie.overview || translate('noDescription')}</p>
                 <div class="list-card__actions">
                     ${renderTrailerButton(trailerUrl)}
                     ${renderFavoriteButton(movie.id, 'movie')}
@@ -233,7 +233,7 @@ async function renderSeriesList(series) {
 
             <div class="list-card__info">
                 <h3>${show.name}</h3>
-                <p class="list-card__rating">⭐ ${show.vote_average}</p>
+                ${renderTmdbRating(show.vote_average, 'list-card__rating')}
                 <div class="list-card__actions">
                     ${renderTrailerButton(trailerUrl)}
                     ${renderFavoriteButton(show.id, 'series')}

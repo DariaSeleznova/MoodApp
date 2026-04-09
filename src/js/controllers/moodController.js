@@ -45,7 +45,7 @@ export async function loadTrendingBooks() {
     try {
         renderer.renderBooksSkeleton();
 
-        const books = await getTrendingBooks(4);
+        const books = await getTrendingBooks(5);
 
         renderer.renderBooks(books);
 
@@ -120,7 +120,7 @@ export async function loadBooks(mood) {
         renderBooksSkeleton();
         const requestId = ++booksRequestId;
 
-        const books = await getBooksByMood(mood, 4);
+        const books = await getBooksByMood(mood, 5);
         if (requestId !== booksRequestId) return;
 
         renderer.renderBooks(books);

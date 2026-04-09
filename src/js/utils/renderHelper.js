@@ -1,4 +1,5 @@
 import { isFavorite } from "./favoritesStorage";
+import logoTMDB from '../../assets/image/logoTMDB.svg';
 
 export function renderFavoriteButton(id, type) {
     return `
@@ -22,6 +23,22 @@ export function renderImage(imageUrl, alt, placeholder, extraClass = '') {
         </div>
     `;
 }
+
+export function renderTmdbRating(rating, className = '') {
+    if (rating === null || rating === undefined || rating === '') {
+        return '';
+    }
+
+    const ratingClasses = ['tmdb-rating', className].filter(Boolean).join(' ');
+
+    return `
+        <p class="${ratingClasses}">
+            <img src="${logoTMDB}" alt="TMDb" class="tmdb-rating__logo" />
+            <span class="tmdb-rating__value">⭐ ${rating}</span>
+        </p>
+    `;
+}
+
 export function renderTrailerButton(trailerUrl) {
     if (!trailerUrl) return '';
 

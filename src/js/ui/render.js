@@ -1,7 +1,7 @@
 import { translate, updateTexts } from '../../js/i18n/i18n.js';
 import { setupFavoriteButton } from '../utils/favoriteHandler.js';
 import { getMovieDetails, getSeriesDetails, getTrailerUrl } from '../services/movieService';
-import { renderFavoriteButton, renderImage, renderTrailerButton } from '../utils/renderHelper.js';
+import { renderFavoriteButton, renderImage, renderTmdbRating, renderTrailerButton } from '../utils/renderHelper.js';
 import imgBook from '../../assets/icons/imgBook.png';
 
 const AUTOPLAY_DELAY = 10000;
@@ -69,7 +69,7 @@ async function showMovie() {
   <div class="movie-card__info">
     <h2 class="movie-card__title">${movie.title}</h2>
 
-    <p class="movie-card__rating">⭐ ${movie.vote_average}</p>
+        ${renderTmdbRating(movie.vote_average, 'movie-card__rating')}
 
     <p class="movie-card__description">
       ${movie.overview || translate('noDescription')}...
@@ -253,7 +253,7 @@ async function showSeries() {
   <div class="series-card__info">
         <h2 class="series-card__title">${show.name}</h2>
     
-        <p class="series-card__rating">⭐ ${show.vote_average}</p>
+      ${renderTmdbRating(show.vote_average, 'series-card__rating')}
         <p class="series-card__description">${show.overview || translate('noDescription')}</p>
         <p class="series-card__meta">
     <span data-i18n="creator"></span>: 🎬 ${creator || '—'} 

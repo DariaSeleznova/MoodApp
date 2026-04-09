@@ -60,6 +60,7 @@ export default {
     noDescription: "Descripción no disponible",
     unknownAuthor: "Autor desconocido",
     trending: "Tendencias",
+    dataSources: "Fuentes de datos:",
     noFavoriteMovies: "Aún no tengo películas favoritas",
     noFavoriteSeries: "Aún no tengo series favoritas",
     noFavoriteMusic: "Aún no tengo música favorita",
